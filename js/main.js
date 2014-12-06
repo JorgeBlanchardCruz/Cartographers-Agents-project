@@ -66,7 +66,7 @@ var MotherSHIP;
 
 var MapParams;
 
-var OceanScene = false, Antialiasing = true, Textures = false, Mapcalculation = false;
+var OceanScene = false, Antialiasing = false, Textures = false, Mapcalculation = false;
 
 var AgentSpeed = 0.05;
 

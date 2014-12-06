@@ -40,7 +40,7 @@ namespace GeneradorMapa
                         if ((al.Next(100) / (float)100) <= (float)((float)c / ((float)(a - 2) * (float)(b - 2))))
                         {
 
-                            Celdas_[i, j] = new Celda(i, j, 3, parent_);
+                            Celdas_[i, j] = new Celda(i, j, 1, parent_);
                             obs++;
 
                         }

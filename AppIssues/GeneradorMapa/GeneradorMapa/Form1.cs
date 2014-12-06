@@ -136,9 +136,6 @@ namespace GeneradorMapa
 
                 }
 
-
-
-
                 using (System.IO.TextWriter mapa = new System.IO.StreamWriter(@"..\..\..\..\..\mapfiles\generado.map"))
                 {
                     texto.ForEach(delegate(string ln)

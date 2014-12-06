@@ -11,12 +11,12 @@ var CAgent = function (Params, speed, ActiveCollisions) {
 
 
     //STRUCTURES
-    function path(name, indx, block, begin, path) {
-        this._name = name;
-        this._indx = indx;
-        this._block = block;
-        this._begin = begin;
-        this._path = path.toString().split(''); //convierte por ejemplo: wwwdaww a 'w','w','w','d','a','w','w'
+    function path(name, path) {
+        this._indx = 0;
+        this._begin = false;
+        this._block = 0;
+        this._name = name;        
+        this._path = path.toString().split('');
 
         this.add_indx = function (Callback) {  //Recorre el vector de trayectoria
             if (!this._begin)
@@ -50,90 +50,7 @@ var CAgent = function (Params, speed, ActiveCollisions) {
              this._indx = 0;
          }
     }
-
-    function branch(nodes, value, heuristic) {
-        this.nodes = nodes;
-        this.value = Number(value);
-        this.heuristic = Number(heuristic);
-
-        this.SearchNode = function (nodesearch) {
-            for (var i = 0; i < this.nodes.length; i++)
-                if (this.nodes[i].equal(nodesearch))
-                    return i;
-
-            return null;
-        }
-
-        this.CompareLastNode = function (nodesearch) {
-            if (this.nodes[this.nodes.length - 1].equal(nodesearch))
-                return true
-
-            return false;
-        }
-
-        this.clone = function () {
-            return new branch(this.nodes.slice(0), this.value, this.heuristic);
-        }
-
-        this.get_StringPath = function () {
-            var stringpath = (Params.NodeSTART.x > Params.NodeOBJETIVE.x ? "d" : "a");
-            var anglestart = (Params.NodeSTART.x > Params.NodeOBJETIVE.x ? 270 : 90);
-         
-            if (this.nodes.length < 1) {
-                return stringpath;
-            }
-            
-            var mov = "horizontal";
-            var change = this.nodes[0].get_direction(this.nodes[1], anglestart);
-            var prevchange = change;
-            for (var i = 0; i < this.nodes.length - 1; i++) {
-                change = (this.nodes[i].get_direction(this.nodes[i + 1], prevchange));
-
-                var prev    = this.nodes[i]
-                var current = this.nodes[i + 1];
-
-                if ((mov == "horizontal" && prev.z == current.z) || (mov == "vertical" && prev.x == current.x))
-                    stringpath += "w";
-                else {
-                    if (mov == "horizontal" && prev.z != current.z) {
-                        mov = "vertical";
-
-                        if (prevchange == 90) {
-                            if (current.z > prev.z)
-                                stringpath += "dw";
-                            else if (current.z < prev.z)
-                                stringpath += "aw";
-
-                        } else if (prevchange == 270) {
-                            if (current.z > prev.z)
-                                stringpath += "aw";
-                            else if (current.z < prev.z)
-                                stringpath += "dw";
-                        }
-                    }
-                    else if (mov == "vertical" && prev.x != current.x) {
-                        mov = "horizontal";
-
-                        if (prevchange == 180) {
-                            if (current.x > prev.x)
-                                stringpath += "dw";
-                            else if (current.x < prev.x)
-                                stringpath += "aw";
-
-                        } else if (prevchange == 0) {
-                            if (current.x > prev.x)
-                                stringpath += "aw";
-                            else if (current.x < prev.x)
-                                stringpath += "dw";
-                        }
-                    }   
-                    var prevchange = change;
-                }
-            }
-            return stringpath;
-        }
-    }
-    
+ 
 
     //ATTRIBUTES
     const _MAXSWING = 0.03;
@@ -147,6 +64,7 @@ var CAgent = function (Params, speed, ActiveCollisions) {
     var _dirswing = false;
 
     //movement
+    var _currentblock = Params.NodeSTART;
     var _speed = speed;
     var _movement = 'stop';
     
@@ -170,6 +88,10 @@ var CAgent = function (Params, speed, ActiveCollisions) {
     Math.radians = function (degrees) {
         return degrees * Math.PI / 180;
     };
+
+    Math.floattoint = function (value) {
+        return value | 0;
+    }
 
     function init() {
         obj_position = document.getElementById('info1');
@@ -218,10 +140,8 @@ var CAgent = function (Params, speed, ActiveCollisions) {
     function Move(movement) {
         _movement = movement;
 
-        //Pulsar i para iniciar el recorrido
-        if (movement == 'i') _Path.play();
-        else                 _Path.stop();
-    
+        if (movement == 'i') { _Path.play(); }
+        else                 { _Path.stop(); }  
         if (_Path._begin) { _movement = _Path.get_CurrentMove(); }
 
         var rotate = 0;
@@ -255,7 +175,7 @@ var CAgent = function (Params, speed, ActiveCollisions) {
                 _Visualobj.rotation.y = Math.radians(_direction);
                 _movement = 'stop';
 
-                _Path.add_indx(Move);
+                if (_Path._begin) { _Path.add_indx(Move); }
                 break;
             default: //stop
                 _Visualobj.translateZ(0);
@@ -268,18 +188,29 @@ var CAgent = function (Params, speed, ActiveCollisions) {
     }
 
     function BlockbyBlock() {
-        if (_Path._block < 0.98) {
-            _Visualobj.translateZ((Borders_Delimeters() ? (ActiveCollisions ? (Collisions() ? _speed : 0) : _speed) : 0));
-            _Path._block += _speed;
+
+        var zdiff = Math.abs(_currentblock.z - _Visualobj.position.z);
+        var xdiff = Math.abs(_currentblock.x - _Visualobj.position.x);
+        var newspeed = _speed;
+
+        if (zdiff > 0)
+            newspeed = (1 - zdiff < _speed ? 1 - zdiff : _speed);
+        else if(xdiff > 0)
+            newspeed = (1 - xdiff < _speed ? 1 - xdiff : _speed);
+
+        if (newspeed != 0) {
+            _Visualobj.translateZ((Borders_Delimeters() ? (ActiveCollisions ? (Collisions() ? newspeed : 0) : newspeed) : 0));
+            _Path._block += newspeed;
         }
         else {      
             _movement = 'stop';
+            _currentblock = new position(_Visualobj.position.z, _Visualobj.position.x);
             _Visualobj.translateZ(0);
 
             _Path._block = 0;
             _Path.add_indx(Move);
 
-            Create_marker(_Visualobj.position.z, _Visualobj.position.x);
+            //Create_marker(_Visualobj.position.z, _Visualobj.position.x);
         }
     }
 
@@ -475,6 +406,113 @@ var CAgent = function (Params, speed, ActiveCollisions) {
 
     function Searchstrategy_ASTAR(START, OBJETIVE, Mapcalculation) {
 
+        function branch(nodes, value, heuristic) {
+            this.nodes = nodes;
+            this.value = Number(value);
+            this.heuristic = Number(heuristic);
+
+            this.SearchNode = function (nodesearch) {
+                for (var i = 0; i < this.nodes.length; i++)
+                    if (this.nodes[i].equal(nodesearch))
+                        return i;
+
+                return null;
+            }
+
+            this.CompareLastNode = function (nodesearch) {
+                if (this.nodes[this.nodes.length - 1].equal(nodesearch))
+                    return true
+
+                return false;
+            }
+
+            this.clone = function () {
+                return new branch(this.nodes.slice(0), this.value, this.heuristic);
+            }
+
+            this.get_StringPath = function () {
+
+                if (this.nodes.length < 1) {
+                    return "";
+                }
+
+                //determinar posicion inicial
+                var stringpath = "";
+                var anglestart = 0;
+                var mov = "horizontal";
+
+                if (this.nodes[0].x != this.nodes[1].x) { //movimiento horizontal
+                    mov = "horizontal";
+                    if (this.nodes[0].x > this.nodes[1].x) { //izquierda
+                        stringpath = "dw";
+                        anglestart = 270;
+                    } else if (this.nodes[0].x < this.nodes[1].x) { //derecha
+                        stringpath = "aw";
+                        anglestart = 90;
+                    }
+                    
+                } else if (Params.NodeSTART.z != this.nodes[1].z) { //movimiento vertical
+                    mov = "vertical";
+                    if (this.nodes[0].z > this.nodes[1].z) { //arriba
+                        stringpath = "aaw";
+                        anglestart = 180;
+                    } else if (this.nodes[0].z < this.nodes[1].z) { //abajo
+                        anglestart = 0;
+                    }
+                    
+                }
+                //-----------------------------------
+    
+                var change = this.nodes[0].get_direction(this.nodes[1], anglestart);
+                var prevchange = change;
+                for (var i = 1; i < this.nodes.length - 1; i++) {
+                    change = (this.nodes[i].get_direction(this.nodes[i + 1], prevchange));
+
+                    var prev = this.nodes[i]
+                    var current = this.nodes[i + 1];
+
+                    if ((mov == "horizontal" && prev.z == current.z) || (mov == "vertical" && prev.x == current.x))
+                        stringpath += "w";
+                    else {
+                        if (mov == "horizontal" && prev.z != current.z) {
+                            mov = "vertical";
+
+                            if (prevchange == 90) {
+                                if (current.z > prev.z)
+                                    stringpath += "dw";
+                                else if (current.z < prev.z)
+                                    stringpath += "aw";
+
+                            } else if (prevchange == 270) {
+                                if (current.z > prev.z)
+                                    stringpath += "aw";
+                                else if (current.z < prev.z)
+                                    stringpath += "dw";
+                            }
+                        }
+                        else if (mov == "vertical" && prev.x != current.x) {
+                            mov = "horizontal";
+
+                            if (prevchange == 180) {
+                                if (current.x > prev.x)
+                                    stringpath += "dw";
+                                else if (current.x < prev.x)
+                                    stringpath += "aw";
+
+                            } else if (prevchange == 0) {
+                                if (current.x > prev.x)
+                                    stringpath += "aw";
+                                else if (current.x < prev.x)
+                                    stringpath += "dw";
+                            }
+                        }
+                        var prevchange = change;
+                    }
+                }
+                return stringpath;
+            }
+        }
+
         function next_calculation() {
             var count_newbranchs = 0;
 
@@ -632,7 +670,7 @@ var CAgent = function (Params, speed, ActiveCollisions) {
     this.Move = function (movement) { Move(movement); };
 
     this.setPath = function (name, agentpath) {
-        _Path = new path(name, 0, 0, false, agentpath);
+        _Path = new path(name, agentpath);
     }
 
     this.Rev = function () {
