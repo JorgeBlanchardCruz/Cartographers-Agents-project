@@ -14,7 +14,6 @@ var CAgent = function (Params, speed, ActiveCollisions) {
     function path(name, path) {
         this._indx = 0;
         this._begin = false;
-        this._block = 0;
         this._name = name;        
         this._path = path.toString().split('');
 
@@ -50,7 +49,7 @@ var CAgent = function (Params, speed, ActiveCollisions) {
              this._indx = 0;
          }
     }
- 
+
 
     //ATTRIBUTES
     const _MAXSWING = 0.03;
@@ -65,8 +64,10 @@ var CAgent = function (Params, speed, ActiveCollisions) {
 
     //movement
     var _currentblock = Params.NodeSTART;
+    var _distanceNewblock = 0;
     var _speed = speed;
     var _movement = 'stop';
+    var _function = 'autonomy';
     
     var _direction = 0;
 
@@ -137,12 +138,27 @@ var CAgent = function (Params, speed, ActiveCollisions) {
         Params.scene.add(object);
     }
 
+    function get_typemovement(){
+        if (_direction == 0 || _direction == 180)
+            return "vertical";
+        if (_direction == 90 || _direction == 270)
+            return "horizontal";
+    }
+
     function Move(movement) {
         _movement = movement;
 
-        if (movement == 'i') { _Path.play(); }
-        else                 { _Path.stop(); }  
-        if (_Path._begin) { _movement = _Path.get_CurrentMove(); }
+        if (movement == 'i') 
+            _Path.play();
+        else 
+            _Path.stop();
+
+        if (_Path._begin){
+            _movement = _Path.get_CurrentMove();
+            _distanceNewblock = 1;
+        }
+        else if (_movement == 'w')
+            _distanceNewblock = 1;
 
         var rotate = 0;
         switch (_movement) {
@@ -184,31 +200,26 @@ var CAgent = function (Params, speed, ActiveCollisions) {
 
         Swing();
         
-        obj_position.innerHTML = '<small> Robot(z,x): ' + _Visualobj.position.z.toFixed(2).toString() + ' ; ' + _Visualobj.position.x.toFixed(2).toString() + '</small>';       
+        obj_position.innerHTML = '<small> agent (z,x): ' + _Visualobj.position.z.toFixed(2).toString() + ' ; ' + _Visualobj.position.x.toFixed(2).toString() + '</small>';       
     }
 
     function BlockbyBlock() {
-
-        var zdiff = Math.abs(_currentblock.z - _Visualobj.position.z);
-        var xdiff = Math.abs(_currentblock.x - _Visualobj.position.x);
-        var newspeed = _speed;
-
-        if (zdiff > 0)
-            newspeed = (1 - zdiff < _speed ? 1 - zdiff : _speed);
-        else if(xdiff > 0)
-            newspeed = (1 - xdiff < _speed ? 1 - xdiff : _speed);
+        var newspeed = (_distanceNewblock < _speed ? _distanceNewblock : _speed);
 
         if (newspeed != 0) {
-            _Visualobj.translateZ((Borders_Delimeters() ? (ActiveCollisions ? (Collisions() ? newspeed : 0) : newspeed) : 0));
-            _Path._block += newspeed;
+            var translate = (Borders_Delimeters() ? (ActiveCollisions ? (Collisions_perBLOCKS() ? newspeed : 0) : newspeed) : 0);
+            _Visualobj.translateZ(translate);
+            _distanceNewblock -= newspeed;
         }
         else {      
             _movement = 'stop';
+            _Visualobj.position.set(Number(_Visualobj.position.x.toFixed(0)), _Visualobj.position.y, Number(_Visualobj.position.z.toFixed(0)));
             _currentblock = new position(_Visualobj.position.z, _Visualobj.position.x);
             _Visualobj.translateZ(0);
 
-            _Path._block = 0;
-            _Path.add_indx(Move);
+            if (_Path._begin) {
+                _Path.add_indx(Move);
+            }
 
             //Create_marker(_Visualobj.position.z, _Visualobj.position.x);
         }
@@ -254,7 +265,7 @@ var CAgent = function (Params, speed, ActiveCollisions) {
                 var object = Params.scene.children[i];
 
                 switch (_direction) { //según el movimiento Wheatley en el mapa
-                    case 0: //adelante
+                    case 0: //abajo
 
                         //mismo eje de movimiento y sentido correcto
                         if ((_Visualobj.position.x.toFixed(0) == object.position.x.toFixed(0)) && (_Visualobj.position.z < object.position.z)) {
@@ -285,7 +296,7 @@ var CAgent = function (Params, speed, ActiveCollisions) {
 
                         break;
 
-                    case 180: //atrás
+                    case 180: //arriba
 
                         //mismo eje de movimiento y sentido correcto
                         if ((_Visualobj.position.x.toFixed(0) == object.position.x.toFixed(0)) && (_Visualobj.position.z > object.position.z)) {
@@ -379,6 +390,69 @@ var CAgent = function (Params, speed, ActiveCollisions) {
         return true;
     }
 
+    function Collisions_perBLOCKS() {
+        //Igualmente, con la percepción del agente, no con los datos del mapa
+        for (var i = 0, l = Params.scene.children.length; i < l; i++) {
+            if (Params.scene.children[i].name == Params.typesblocks[0]) { //Params.typesblocks.[0] = 'obstacle'
+
+                var object = Params.scene.children[i];
+                switch (_direction) {
+                    case 0: //abajo
+                        //mismo eje de movimiento y sentido correcto
+                        if ((_Visualobj.position.x.toFixed(0) == object.position.x.toFixed(0)) && (_Visualobj.position.z < object.position.z)) {
+                            var distance = object.position.z - _Visualobj.position.z;
+                            if (distance <= 1) {
+                                _movement = Params.typesblocks[0] + _direction;
+
+                                _Path.reset();
+                                return false;
+                            }
+                        }
+                        break;
+                    case 180: //arriba
+                        //mismo eje de movimiento y sentido correcto
+                        if ((_Visualobj.position.x.toFixed(0) == object.position.x.toFixed(0)) && (_Visualobj.position.z > object.position.z)) {
+                            var distance = _Visualobj.position.z - object.position.z;
+                            if (distance <= 1) {
+                                _movement = Params.typesblocks[0] + _direction;
+
+                                _Path.reset();
+                                return false;
+                            }
+                        }
+
+                        break;
+                    case 90: //izquierda
+                        //mismo eje de movimiento y sentido correcto
+                        if ((_Visualobj.position.z.toFixed(0) == object.position.z.toFixed(0)) && (_Visualobj.position.x < object.position.x)) {
+                            var distance = object.position.x - _Visualobj.position.x;
+                            if (distance <= 1) {
+                                _movement = Params.typesblocks[0] + _direction;
+
+                                _Path.reset();
+                                return false;
+                            }
+                        }
+                        break;
+                    case 270: //derecha
+                        //mismo eje de movimiento y sentido correcto
+                        if ((_Visualobj.position.z.toFixed(0) == object.position.z.toFixed(0)) && (_Visualobj.position.x > object.position.x)) {
+                            var distance = _Visualobj.position.x - object.position.x;
+                            if (distance <= 1) {
+                                _movement = Params.typesblocks[0] + _direction;
+
+                                _Path.reset();
+                                return false;
+                            }
+                        }
+                        break;
+                }
+            }
+        }
+
+        return true;
+    }
+
     function Swing() {
         //provoca una pequeña animación de arriba-abajo a Wheatley
         if (_countswing <= _MAXSWING) {
@@ -457,9 +531,9 @@ var CAgent = function (Params, speed, ActiveCollisions) {
                         stringpath = "aaw";
                         anglestart = 180;
                     } else if (this.nodes[0].z < this.nodes[1].z) { //abajo
+                        stringpath = "w"
                         anglestart = 0;
-                    }
-                    
+                    }             
                 }
                 //-----------------------------------
     

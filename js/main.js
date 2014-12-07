@@ -119,7 +119,7 @@ function set_HTMLObjects() {
 
 function Add_Events() {
 
-    document.onkeypress = document_onkeypress;
+    document.addEventListener('keypress', document_onkeypress, false);
     window.addEventListener('resize', onWindowResize, false);
 
     btnCalcASTAR.addEventListener('click', CalculateASTAR);
