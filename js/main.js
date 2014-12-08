@@ -11,6 +11,8 @@ window.onload = main;
 
 
 //STRUCTURES
+/*estaría bien ponerlas dentro de la clase C3DWorld, pero no sé como referenciarlas en js
+sin tener que enviar a las demas clases como parámetro una instancia de dicha clase.*/
 function position(z, x) {
     this.z = z;
     this.x = x;
