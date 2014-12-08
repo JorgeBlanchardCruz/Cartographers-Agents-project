@@ -7,7 +7,7 @@
 "use strict";
 
 //la dimensión 'y' ha sido bloqueada
-var CAgent = function (Params, Tasks, speed, ActiveCollisions) {
+var CAgent = function (Params, Tasks, speed, Position, ActiveCollisions) {
 
     //STRUCTURES
     function path(name, path) {
@@ -70,7 +70,7 @@ var CAgent = function (Params, Tasks, speed, ActiveCollisions) {
     const _BLOCKFREE = -1;
     const _BLOCKEXIT = 'e';
 
-    var _Startpos = new position(Params.NodeSTART.z, Params.NodeSTART.x);
+    var _Startpos = new position(Position.z, Position.x);
     var _Visualobj;  //objeto visual en el mundo 3d 
 
     //SWING
@@ -149,9 +149,9 @@ var CAgent = function (Params, Tasks, speed, ActiveCollisions) {
     }
 
     function Create_markerCalc(z, x) {
-        var object = new THREE.Mesh(new THREE.BoxGeometry(1, 1, 1), new THREE.MeshBasicMaterial({ transparent: true, opacity: 0.5, color: '#7938D9' }));
+        var object = new THREE.Mesh(new THREE.BoxGeometry(1, 1, 1), new THREE.MeshBasicMaterial({ transparent: true, opacity: 0.2, color: '#7938D9' }));
         object.name = "markerCalc";
-        object.position.set(x, 0.2, z);
+        object.position.set(x, 0, z);
 
         Params.scene.add(object);
     }
@@ -159,7 +159,7 @@ var CAgent = function (Params, Tasks, speed, ActiveCollisions) {
     function Move(movement) {
         _movement = movement;
 
-        if (movement == 'path') 
+        if (_movement == 'path')
             _Path.play();
         else 
             _Path.stop();
@@ -202,7 +202,11 @@ var CAgent = function (Params, Tasks, speed, ActiveCollisions) {
                 _Visualobj.rotation.y = Math.radians(_direction);
                 _movement = 'stop';
 
-                if (_Path._begin) { _Path.add_indx(Move); }
+                _Path.add_indx(Move);
+                break;
+            case 'obstacle':
+                _Visualobj.position.set(Number(_Visualobj.position.x.toFixed(0)), _Visualobj.position.y, Number(_Visualobj.position.z.toFixed(0)));
+                Reactor();
                 break;
             default: //stop
                 _Visualobj.translateZ(0);
@@ -227,22 +231,39 @@ var CAgent = function (Params, Tasks, speed, ActiveCollisions) {
             _Visualobj.position.set(Number(_Visualobj.position.x.toFixed(0)), _Visualobj.position.y, Number(_Visualobj.position.z.toFixed(0)));
             _currentblock = new position(_Visualobj.position.z, _Visualobj.position.x);
 
-            Params.MAPMatrix[_Visualobj.position.z][_Visualobj.position.x] = _BLOCKVISITED;
+            if (Params.MAPMatrix[_Visualobj.position.z][_Visualobj.position.x] != _BLOCKVISITED) {
+                Params.MAPMatrix[_Visualobj.position.z][_Visualobj.position.x] = _BLOCKVISITED;
+                Create_markerCalc(_Visualobj.position.z, _Visualobj.position.x);
+            }
+            
 
             _Visualobj.translateZ(0);
 
-            Autonomy();
+            _Path.add_indx(Move);
+            //Create_marker(_Visualobj.position.z, _Visualobj.position.x);
 
-            if (_Path._begin) {
-                _Path.add_indx(Move);
-                //Create_marker(_Visualobj.position.z, _Visualobj.position.x);
-            }        
+            Autonomy();
         }
+
+        return;
     }
 
     function Autonomy() {
         if (_function != 'autonomy')
             return undefined;
+
+        function UpdateSensors() {
+            var z = _Visualobj.position.z;
+            var x = _Visualobj.position.x;
+            _sensors._up = (z > 0 ? Params.MAPMatrix[z - 1][x] : _BLOCKEXIT);
+            _sensors._down = (z < Params.height - 1 ? Params.MAPMatrix[z + 1][x] : _BLOCKEXIT);
+            _sensors._right = (x < Params.width - 1 ? Params.MAPMatrix[z][x + 1] : _BLOCKEXIT);
+            _sensors._left = (x > 0 ? Params.MAPMatrix[z][x - 1] : _BLOCKEXIT);
+            //_sensors._upperrightdiagonal = (z > 0 && x < Params.width - 1 ? Params.MAPMatrix[z - 1][x + 1] : _BLOCKEXIT);
+            //_sensors._upperleftdiagonal = (z > 0 && x > 0 ? Params.MAPMatrix[z - 1][x - 1] : _BLOCKEXIT);
+            //_sensors._lowerrightdiagonal = (z < Params.height - 1 && x < Params.width - 1 ? Params.MAPMatrix[z + 1][x + 1] : _BLOCKEXIT);
+            //_sensors._lowerleftdiagonal = (z < Params.height - 1 && x > 0 ? Params.MAPMatrix[z + 1][x - 1] : _BLOCKEXIT);
+        }
 
         function CreateTasks(mov) {
             /*debe dejar tareas por hacer de los lugares que no visita,
@@ -265,9 +286,22 @@ var CAgent = function (Params, Tasks, speed, ActiveCollisions) {
             }                
         }
 
+        function Bound() {
+            /* Sirve para eliminar todas las tareas por las que su posición ya se haya pasado.
+            Tareas obsoletas.
+            */
+            for (var i = 0; i < Tasks.length; i++) {
+                var state = Params.MAPMatrix[Tasks[i]._position.z][Tasks[i]._position.x];
+                if (state == _BLOCKVISITED) {
+                    Tasks.splice(i, 1);
+                    i--;
+                }
+            }
+        }
+
         UpdateSensors();
 
-        var movement = "";
+        var movement = "stop";
         var currentpos = new position(_Visualobj.position.z, _Visualobj.position.x);
         var Up = (_sensors._up == _BLOCKFREE ? 1 : 0);
         var Down = (_sensors._down == _BLOCKFREE ? 1 : 0);
@@ -303,44 +337,50 @@ var CAgent = function (Params, Tasks, speed, ActiveCollisions) {
             movement = "w";
         }
     
-        if (movement == "") { // no hay movimiento posible
+        if (movement == "stop") { // no hay movimiento posible
             /*busca en las tareas. En caso de que exista tarea por realizar, 
-            ejecutará A* para determinar la ruta mínima de los caminos visitados y llegar hasta la posición de la tarea.*/        
+            ejecutará A* para determinar la ruta mínima de los caminos visitados y llegar hasta la posición de la tarea.*/
+
+            Bound();
+
             var Start = new position(_Visualobj.position.z, _Visualobj.position.x);
             var Objetive;
             if (Tasks.length > 0) { //si hay tareas pendientes
-                var maketask = Tasks.pop(); //recoge una
-                Objetive = new position(maketask._position.z, maketask._position.x);
+                do {
+                    var maketask = Tasks[Tasks.length - 1]; //recoge la ultima que su posición sea diferente a la actual
+                    /*se recoge la última por que se supone más cercana a la posición actual*/
+                    Objetive = new position(maketask._position.z, maketask._position.x);
+
+                    if (Start.equal(Objetive))
+                        Tasks.pop();
+
+                } while (Start.equal(Objetive) && Tasks.length > 0);
             }
             else
                 Objetive = _Startpos; //sino, vuelve a su punto de partida.
 
             var stringpath = Searchstrategy_ASTAR(Start, Objetive, false); //Busca camino mínimo hasta la tarea
-            if (stringpath == "") // sino existe, cosa rara, vuelve a su punto de partida.
-                stringpath = Searchstrategy_ASTAR(Start, _Startpos, false);
+            if (stringpath != "") //si existe el camino
+                Tasks.pop(); //ahora es cuando eliminamos la tarea pendiente.
+            else { // sino existe
+                stringpath = Searchstrategy_ASTAR(Start, _Startpos, false); //vuelve a su punto de partida.
+            }
 
-            setPath("minimum_path", stringpath);
-
-            _direction = 0;
-            _Visualobj.rotation.y = Math.radians(_direction);
-            movement = "path";
-            _function = "path";
+            if (stringpath != "") { 
+                setPath("minimum_path", stringpath);
+                
+                _direction = 0;
+                _Visualobj.rotation.y = Math.radians(_direction);
+                _function = "path";
+                movement = _function;
+            }
+            else { //si ya se encuentra en su punto de partida y ha terminado todas las tareas
+                //entra en estado de espera de tareas
+                _function = "wait";
+            }
         }
 
         Move(movement);
-    }
-
-    function UpdateSensors() {
-        var z = _Visualobj.position.z;
-        var x = _Visualobj.position.x;
-        _sensors._up = (z > 0 ? Params.MAPMatrix[z - 1][x] : _BLOCKEXIT);
-        _sensors._down = (z < Params.height - 1 ? Params.MAPMatrix[z + 1][x] : _BLOCKEXIT);
-        _sensors._right = (x > 0 ? Params.MAPMatrix[z][x + 1] : _BLOCKEXIT);
-        _sensors._left = (x < Params.width - 1 ? Params.MAPMatrix[z][x - 1] : _BLOCKEXIT);
-        _sensors._upperrightdiagonal = (z > 0 && x < Params.width - 1 ? Params.MAPMatrix[z - 1][x + 1] : _BLOCKEXIT);
-        _sensors._upperleftdiagonal = (z > 0 && x > 0 ? Params.MAPMatrix[z - 1][x - 1] : _BLOCKEXIT);
-        _sensors._lowerrightdiagonal = (z < Params.height - 1 && x < Params.width - 1 ? Params.MAPMatrix[z + 1][x + 1] : _BLOCKEXIT);
-        _sensors._lowerleftdiagonal = (z < Params.height - 1 && x > 0 ? Params.MAPMatrix[z + 1][x - 1] : _BLOCKEXIT);
     }
 
     function Borders_Delimeters() {
@@ -392,7 +432,8 @@ var CAgent = function (Params, Tasks, speed, ActiveCollisions) {
                             if (distance < 1) { //desechamos los lejanos
                                 var distancetoObstacle = (object.position.z - (object.scale.z / 2)) - (_Visualobj.position.z + (_SIZE / 2));
                                 if (distancetoObstacle <= 0.0) { //comprobamos la distancia del cercano
-                                    _movement = Params.typesblocks[0] + _direction;
+                                    //_movement = Params.typesblocks[0] + _direction;
+                                    _movement = Params.typesblocks[0];
 
                                     _Path.reset();
                                     return false;
@@ -404,7 +445,8 @@ var CAgent = function (Params, Tasks, speed, ActiveCollisions) {
                             if ((_Visualobj.position.x >= objwallmin) && ((_Visualobj.position.x) <= objwallMax)) {
                                 var distancetoObstacle = Math.abs((object.position.z - (object.scale.z / 2)) - (_Visualobj.position.z + (_SIZE / 2)));
                                 if (distancetoObstacle == 0.0) { //comprobamos la distancia del cercano
-                                    _movement = Params.typesblocks[0] + _direction;
+                                    //_movement = Params.typesblocks[0] + _direction;
+                                    _movement = Params.typesblocks[0];
 
                                     _Path.reset();
                                     return false;
@@ -423,7 +465,8 @@ var CAgent = function (Params, Tasks, speed, ActiveCollisions) {
                             if (distance < 1) { //desechamos los lejanos
                                 var distancetoObstacle = (_Visualobj.position.z - (_SIZE / 2)) - (object.position.z + (object.scale.z / 2));
                                 if (distancetoObstacle <= 0.0) { //comprobamos la distancia del cercano
-                                    _movement = Params.typesblocks[0] + _direction;
+                                    //_movement = Params.typesblocks[0] + _direction;
+                                    _movement = Params.typesblocks[0];
 
                                     _Path.reset();
                                     return false;
@@ -435,7 +478,8 @@ var CAgent = function (Params, Tasks, speed, ActiveCollisions) {
                             if ((_Visualobj.position.x >= objwallmin) && ((_Visualobj.position.x) <= objwallMax)) {
                                 var distancetoObstacle = Math.abs((_Visualobj.position.z - (_SIZE / 2)) - (object.position.z + (object.scale.z / 2)));
                                 if (distancetoObstacle == 0.0) { //comprobamos la distancia del cercano
-                                    _movement = Params.typesblocks[0] + _direction;
+                                    //_movement = Params.typesblocks[0] + _direction;
+                                    _movement = Params.typesblocks[0];
 
                                     _Path.reset();
                                     return false;
@@ -454,7 +498,8 @@ var CAgent = function (Params, Tasks, speed, ActiveCollisions) {
                             if (distance < 1) { //desechamos los lejanos
                                 var distancetoObstacle = (object.position.x - (object.scale.x / 2)) - (_Visualobj.position.x + (_SIZE / 2));
                                 if (distancetoObstacle <= 0.0) { //comprobamos la distancia del cercano
-                                    _movement = Params.typesblocks[0] + _direction;
+                                    //_movement = Params.typesblocks[0] + _direction;
+                                    _movement = Params.typesblocks[0];
 
                                     _Path.reset();
                                     return false;
@@ -466,7 +511,8 @@ var CAgent = function (Params, Tasks, speed, ActiveCollisions) {
                             if ((_Visualobj.position.z >= objwallmin) && ((_Visualobj.position.z) <= objwallMax)) {
                                 var distancetoObstacle = Math.abs((object.position.x - (object.scale.x / 2)) - (_Visualobj.position.x + (_SIZE / 2)));
                                 if (distancetoObstacle == 0.0) { //comprobamos la distancia del cercano
-                                    _movement = Params.typesblocks[0] + _direction;
+                                    //_movement = Params.typesblocks[0] + _direction;
+                                    _movement = Params.typesblocks[0];
 
                                     _Path.reset();
                                     return false;
@@ -484,7 +530,10 @@ var CAgent = function (Params, Tasks, speed, ActiveCollisions) {
                             if (distance < 1) { //desechamos los lejanos
                                 var distancetoObstacle = (_Visualobj.position.x - (_SIZE / 2)) - (object.position.x + (object.scale.x / 2));
                                 if (distancetoObstacle <= 0.0) { //comprobamos la distancia del cercano
-                                    _movement = Params.typesblocks[0] + _direction;
+                                    //_movement = Params.typesblocks[0] + _direction;
+                                    _movement = Params.typesblocks[0];
+
+                                    _Path.reset();
                                     return false;
                                 }
                             }
@@ -494,7 +543,8 @@ var CAgent = function (Params, Tasks, speed, ActiveCollisions) {
                             if ((_Visualobj.position.z >= objwallmin) && ((_Visualobj.position.z) <= objwallMax)) {
                                 var distancetoObstacle = Math.abs((_Visualobj.position.x - (_SIZE / 2)) - (object.position.x + (object.scale.x / 2)));
                                 if (distancetoObstacle == 0.0) { //comprobamos la distancia del cercano
-                                    _movement = Params.typesblocks[0] + _direction;
+                                    //_movement = Params.typesblocks[0] + _direction;
+                                    _movement = Params.typesblocks[0];
 
                                     _Path.reset();
                                     return false;
@@ -520,7 +570,8 @@ var CAgent = function (Params, Tasks, speed, ActiveCollisions) {
                         if ((_Visualobj.position.x.toFixed(0) == object.position.x.toFixed(0)) && (_Visualobj.position.z < object.position.z)) {
                             var distance = object.position.z - _Visualobj.position.z;
                             if (distance <= 1) {
-                                _movement = Params.typesblocks[0] + _direction;
+                                //_movement = Params.typesblocks[0] + _direction;
+                                _movement = Params.typesblocks[0];
 
                                 _Path.reset();
                                 return false;
@@ -532,7 +583,8 @@ var CAgent = function (Params, Tasks, speed, ActiveCollisions) {
                         if ((_Visualobj.position.x.toFixed(0) == object.position.x.toFixed(0)) && (_Visualobj.position.z > object.position.z)) {
                             var distance = _Visualobj.position.z - object.position.z;
                             if (distance <= 1) {
-                                _movement = Params.typesblocks[0] + _direction;
+                                //_movement = Params.typesblocks[0] + _direction;
+                                _movement = Params.typesblocks[0];
 
                                 _Path.reset();
                                 return false;
@@ -545,7 +597,8 @@ var CAgent = function (Params, Tasks, speed, ActiveCollisions) {
                         if ((_Visualobj.position.z.toFixed(0) == object.position.z.toFixed(0)) && (_Visualobj.position.x < object.position.x)) {
                             var distance = object.position.x - _Visualobj.position.x;
                             if (distance <= 1) {
-                                _movement = Params.typesblocks[0] + _direction;
+                                //_movement = Params.typesblocks[0] + _direction;
+                                _movement = Params.typesblocks[0];
 
                                 _Path.reset();
                                 return false;
@@ -557,7 +610,8 @@ var CAgent = function (Params, Tasks, speed, ActiveCollisions) {
                         if ((_Visualobj.position.z.toFixed(0) == object.position.z.toFixed(0)) && (_Visualobj.position.x > object.position.x)) {
                             var distance = _Visualobj.position.x - object.position.x;
                             if (distance <= 1) {
-                                _movement = Params.typesblocks[0] + _direction;
+                                //_movement = Params.typesblocks[0] + _direction;
+                                _movement = Params.typesblocks[0];
 
                                 _Path.reset();
                                 return false;
@@ -617,7 +671,7 @@ var CAgent = function (Params, Tasks, speed, ActiveCollisions) {
 
             this.get_StringPath = function () {
 
-                if (this.nodes.length < 1) {
+                if (this.nodes.length < 2) {
                     return "";
                 }
 
@@ -703,7 +757,7 @@ var CAgent = function (Params, Tasks, speed, ActiveCollisions) {
 
             function AddCalculation(nbranch, z, x, type) {
                 //if ((type == -1) || ((type >= 0 && type <= Params.typesblocks.length - 1) && (Params.blocks[type]._type != 'obstacle'))) {
-                if (type == 'v' || type == -1) {
+                if (type == 'v' || ((OBJETIVE.z == z && OBJETIVE.x == x) && type == -1)) {
 
                     var newnode = new position(z, x);
                     nbranch.nodes.push(newnode);
@@ -860,7 +914,6 @@ var CAgent = function (Params, Tasks, speed, ActiveCollisions) {
         Autonomy();
     }
 
-
     function Rev() {
         _Path.reset();
         _Visualobj.position.set(_Startpos.x, 0, _Startpos.z);
@@ -874,24 +927,25 @@ var CAgent = function (Params, Tasks, speed, ActiveCollisions) {
         setPath(name, agentpath);
     }
 
-    this.Move = function (accion) {
-        Move(accion);
-    };
-
     this.Play = function () {
         Reactor();
     };
 
+    this.ChangeSpeed = function (speed) {
+        _speed = speed;
+    }
+
     this.Pause = function () {
         _function = 'nothing';
+        _movement = 'stop';
     };
 
     this.Rev = function () {
         Rev();
     }
 
-    this.ChangeSpeed = function (speed) {
-        _speed = speed;
-    }
+    this.Move = function (accion) {
+        Move(accion);
+    };
 
 };

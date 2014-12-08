@@ -75,7 +75,7 @@ var MapParams;
 
 var OceanScene = false, Antialiasing = false, Textures = false, Mapcalculation = false;
 
-var AgentSpeed = 0.05;
+var AgentSpeed = 0.05; //0.2
 
 //UI objects
     var btnfile_input;
@@ -182,12 +182,12 @@ function toggleFullScreen() {
 
 function AgentMove(key) {
     if (MotherSHIP != null)
-        MotherSHIP.Agent().Move(key);
+        MotherSHIP.Move(key);
 }
 
 function Play() {
     if (MotherSHIP != null)
-        MotherSHIP.Agent().Play();
+        MotherSHIP.Play();
 }
 
 function ChangeSpeed() {
@@ -204,17 +204,17 @@ function ChangeSpeed() {
         default:
             AgentSpeed = 0.05;
     }
-    MotherSHIP.Agent().ChangeSpeed(AgentSpeed);
+    MotherSHIP.ChangeSpeed(AgentSpeed);
 }
 
 function Pause() {
     if (MotherSHIP != null)
-        MotherSHIP.Agent().Pause();
+        MotherSHIP.Pause();
 }
 
 function Rev() {
     if (MotherSHIP != null)
-        MotherSHIP.Agent().Rev();
+        MotherSHIP.Rev();
 }
 
 //EVENTS
