@@ -24,6 +24,10 @@ function position(z, x) {
         return false;
     }
 
+    this.Manhattan_distance = function (objetive) {
+        return (Math.abs(Number(this.x) - Number(objetive.x)) + Math.abs(Number(this.z) - Number(objetive.z)));
+    }
+
     this.get_direction = function (poscompare, prevpos) {
         //no hay movimientos en diagonal
         if ((this.z == poscompare.z) && (this.x == poscompare.x))

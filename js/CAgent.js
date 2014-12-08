@@ -23,7 +23,7 @@ var CAgent = function (Params, Tasks, speed, Position, ActiveCollisions) {
             if (this._indx < this._path.length - 1) {
                 this._indx++;
 
-                Callback('path');
+                Callback("path");
             }
             else if (this._indx >= this._path.length - 1) {
                 this.reset();
@@ -108,15 +108,16 @@ var CAgent = function (Params, Tasks, speed, Position, ActiveCollisions) {
 
     Math.floattoint = function (value) {
         return value | 0;
-    }
+    };
     //////////////////////////////////////////////
 
     function init() {
         obj_position = document.getElementById('info1');
 
-        Load_objmtl('meshes/WheatleyModel.obj', 'meshes/Ghost.mtl', _Startpos.x, 0, _Startpos.z, 0.08, 0.08, 0.08);
+        Load_objmtl('meshes/WheatleyModel.obj', 'meshes/Ghost.mtl', _Startpos.x, 0, _Startpos.z, 0.08, 0.08, 0.08);   
 
         Params.MAPMatrix[_Startpos.z][_Startpos.x] = _BLOCKVISITED;
+        Create_markerCalc(_Startpos.z, _Startpos.x);
 
         animate();
     }
@@ -157,10 +158,71 @@ var CAgent = function (Params, Tasks, speed, Position, ActiveCollisions) {
         Params.scene.add(object);
     }
 
+    function SetBlockvisited() {
+        _Visualobj.position.set(Number(_Visualobj.position.x.toFixed(0)), _Visualobj.position.y, Number(_Visualobj.position.z.toFixed(0)));
+        if (Params.MAPMatrix[_Visualobj.position.z][_Visualobj.position.x] != _BLOCKVISITED) {
+            Params.MAPMatrix[_Visualobj.position.z][_Visualobj.position.x] = _BLOCKVISITED;
+            Create_markerCalc(_Visualobj.position.z, _Visualobj.position.x);
+        }
+    }
+
+    function animate() {
+        requestAnimationFrame(animate);
+
+        if (_Visualobj != null)
+            AccionAnimation();
+    }
+
+    function AccionAnimation() {
+
+        if (_movement != undefined) {
+            switch (_movement.toLowerCase()) {
+                case 'w':
+                    BlockbyBlock();
+                    break;
+                case 'a':
+                case 'd':
+                    _Visualobj.rotation.y = Math.radians(_direction);
+                    _movement = 'stop';
+
+                    _Path.add_indx(Move);
+                    break;
+                case 'obstacle':
+                    SetBlockvisited();
+                    Reactor();
+                    break;
+                default: //stop
+                    _Visualobj.translateZ(0);
+                    break;
+            }
+        }
+
+        Swing();
+
+        if (_function == "wait" && Tasks.length > 0) {
+            //Si el agente está esperando, que ejecute su autonomia para comprobar si hay nuevas tareas.
+            Reactor();
+        }
+
+        obj_position.innerHTML = '<small> agent (z,x): ' + _Visualobj.position.z.toFixed(2).toString() + ' ; ' + _Visualobj.position.x.toFixed(2).toString() + '</small>';
+    }
+
+    function Swing() {
+        //provoca una pequeña animación de arriba-abajo a Wheatley
+        if (_countswing <= _MAXSWING) {
+            _Visualobj.position.y += (_dirswing == false ? _SWINGSPEED : _SWINGSPEED * (-1));
+            _countswing += _SWINGSPEED;
+        }
+        else {
+            _dirswing = (_dirswing == false ? true : false);
+            _countswing = 0
+        }
+    }
+
     function Move(movement) {
         _movement = movement;
 
-        if (_movement == 'path')
+        if (_movement == "path")
             _Path.play();
         else 
             _Path.stop();
@@ -193,51 +255,8 @@ var CAgent = function (Params, Tasks, speed, Position, ActiveCollisions) {
         }
     }
 
-    function AccionAnimation() {
-        switch (_movement.toLowerCase()) {
-            case 'w':
-                BlockbyBlock();
-                break;
-            case 'a':
-            case 'd':
-                _Visualobj.rotation.y = Math.radians(_direction);
-                _movement = 'stop';
 
-                _Path.add_indx(Move);
-                break;
-            case 'obstacle':
-                _Visualobj.position.set(Number(_Visualobj.position.x.toFixed(0)), _Visualobj.position.y, Number(_Visualobj.position.z.toFixed(0)));
-                Reactor();
-                break;
-            default: //stop
-                _Visualobj.translateZ(0);
-                break;
-        }
-
-        Swing();
-        
-        obj_position.innerHTML = '<small> agent (z,x): ' + _Visualobj.position.z.toFixed(2).toString() + ' ; ' + _Visualobj.position.x.toFixed(2).toString() + '</small>';       
-    }
-
-    function Swing() {
-        //provoca una pequeña animación de arriba-abajo a Wheatley
-        if (_countswing <= _MAXSWING) {
-            _Visualobj.position.y += (_dirswing == false ? _SWINGSPEED : _SWINGSPEED * (-1));
-            _countswing += _SWINGSPEED;
-        }
-        else {
-            _dirswing = (_dirswing == false ? true : false);
-            _countswing = 0
-        }
-    }
-
-    function animate() {
-        requestAnimationFrame(animate);
-
-        if (_Visualobj != null) AccionAnimation();
-    }
-
-    //IA------------------------------------------------------------------------------
+    //  IA  ------------------------------------------------------------------------------
     function BlockbyBlock() {
         var newspeed = (_distanceNewblock < _speed ? _distanceNewblock : _speed);
 
@@ -248,14 +267,9 @@ var CAgent = function (Params, Tasks, speed, Position, ActiveCollisions) {
         }
         else {
             _movement = 'stop';
-            _Visualobj.position.set(Number(_Visualobj.position.x.toFixed(0)), _Visualobj.position.y, Number(_Visualobj.position.z.toFixed(0)));
-            _currentblock = new position(_Visualobj.position.z, _Visualobj.position.x);
 
-            if (Params.MAPMatrix[_Visualobj.position.z][_Visualobj.position.x] != _BLOCKVISITED) {
-                Params.MAPMatrix[_Visualobj.position.z][_Visualobj.position.x] = _BLOCKVISITED;
-                Create_markerCalc(_Visualobj.position.z, _Visualobj.position.x);
-            }
-
+            SetBlockvisited();            
+            _currentblock = new position(_Visualobj.position.z, _Visualobj.position.x);            
 
             _Visualobj.translateZ(0);
 
@@ -711,9 +725,7 @@ var CAgent = function (Params, Tasks, speed, Position, ActiveCollisions) {
         }
 
         function heuristic(node, objetive){
-            //distancia Manhattan
-            var Manhattan = (Math.abs(Number(node.x) - Number(objetive.x)) + Math.abs(Number(node.z) - Number(objetive.z)));
-            return Manhattan;
+            return node.Manhattan_distance(objetive);
         }
         //--------------------------------------------
 
@@ -776,6 +788,8 @@ var CAgent = function (Params, Tasks, speed, Position, ActiveCollisions) {
         if (_function != 'autonomy')
             return;
 
+        var movement = "stop";
+
         function UpdateSensors() {
             var z = _Visualobj.position.z;
             var x = _Visualobj.position.x;
@@ -811,8 +825,7 @@ var CAgent = function (Params, Tasks, speed, Position, ActiveCollisions) {
                     Tasks.push(new task(new position(currentpos.z, currentpos.x - 1), 270));
                 }
             }
-
-            var movement = "stop";
+            
             var currentpos = new position(_Visualobj.position.z, _Visualobj.position.x);
             var Up = (_sensors._up == _BLOCKFREE ? 1 : 0);
             var Down = (_sensors._down == _BLOCKFREE ? 1 : 0);
@@ -864,49 +877,112 @@ var CAgent = function (Params, Tasks, speed, Position, ActiveCollisions) {
                 }
             }
 
-            if (movement == "stop") { // no hay movimiento posible
-                /*busca en las tareas. En caso de que exista tarea por realizar, 
-                ejecutará A* para determinar la ruta mínima de los caminos visitados y llegar hasta la posición de la tarea.*/
+            function Nearest_task() {
 
-                Bound(); //Eliminar tareas obsoletas.
+                function Discarded() {
+                    var discard = false;
+                    var j = 0;
+                    while (!discard && j < DiscardTasks.length) {
+                        if (DiscardTasks[j]._position.equal(Tasks[i]._position))
+                            discard = true;
 
-                var Start = new position(_Visualobj.position.z, _Visualobj.position.x);
-                var Objetive;
+                        j++;
+                    }
+
+                    return discard;
+                }
+
+                if (Tasks.length <= 0)
+                    return;
+
+                var Distance = Start.Manhattan_distance(Tasks[0]._position);
+                var min = 0;
+                for (var i = 1; i < Tasks.length; i++) {
+                    var newdistance = Start.Manhattan_distance(Tasks[i]._position);
+
+                    if (!Discarded() && Distance > newdistance) {
+                        Distance = newdistance;
+                        min = i;
+                    }
+                }
+
+                return min;
+            }
+
+            function ExecPath(stringpath){
+                setPath("minimum_path", stringpath);
+
+                _direction = 0;
+                _Visualobj.rotation.y = Math.radians(_direction);
+                    
+                movement = "path";
+            }
+
+            if (movement != "stop") // no hay movimiento posible
+                return;
+
+            /*busca en las tareas. En caso de que exista tarea por realizar, 
+            ejecutará A* para determinar la ruta mínima de los caminos visitados y llegar hasta la posición de la tarea.*/
+
+            Bound(); //Eliminar tareas obsoletas.
+
+            var DiscardTasks = new Array();
+            var Start = new position(_Visualobj.position.z, _Visualobj.position.x);
+            var Objetive;
+            var iTask = -1; //se utiliza para obtener la tarea a realizar y en la nueva iteración, que no la tenga encuenta
+            var chosen = false;
+            while (!chosen && Tasks.length > 0) {   
+
                 if (Tasks.length > 0) { //si hay tareas pendientes
-                    do {
-                        var maketask = Tasks[Tasks.length - 1]; //recoge la ultima que su posición sea diferente a la actual
-                        /*se recoge la última por que se supone más cercana a la posición actual*/
+                    do { //recoge la posición más cercana que sea diferente de su posición actual
+
+                        iTask = Nearest_task();
+                        var maketask = Tasks[iTask];
+                            
                         Objetive = new position(maketask._position.z, maketask._position.x);
 
                         if (Start.equal(Objetive))
-                            Tasks.pop();
+                            Tasks.splice(iTask, 1);
 
                     } while (Start.equal(Objetive) && Tasks.length > 0);
+
+                    if (Tasks.length <= 0)
+                        Objetive = _Startpos;
                 }
                 else
-                    Objetive = _Startpos; //sino, vuelve a su punto de partida.
+                    Objetive = _Startpos;
 
                 var stringpath = Searchstrategy_ASTAR(Start, Objetive, false); //Busca camino mínimo hasta la tarea
-                if (stringpath != "") //si existe el camino
-                    Tasks.pop(); //ahora es cuando eliminamos la tarea pendiente.
-                else { // sino existe
-                    stringpath = Searchstrategy_ASTAR(Start, _Startpos, false); //vuelve a su punto de partida.
-                }
+                if (stringpath != "") {//si existe el camino
+                    Tasks.splice(iTask, 1); //ahora es cuando eliminamos la tarea pendiente.
 
-                if (stringpath != "") {
-                    setPath("minimum_path", stringpath);
-
-                    _direction = 0;
-                    _Visualobj.rotation.y = Math.radians(_direction);
+                    ExecPath(stringpath);
                     _function = "path";
-                    movement = _function;
+
+                    chosen = true;
                 }
-                else { //si ya se encuentra en su punto de partida y ha terminado todas las tareas
-                    //entra en estado de espera de tareas
-                    _function = "wait";
+                else { //sino existe camino
+                    //ponemos la tarea donde las desechadas para está vez.
+                    DiscardTasks.push(Tasks[iTask]);
+
+                    chosen = false;
                 }
             }
 
+            
+            if (!chosen && Tasks.length <= 0) {
+                Objetive = _Startpos;
+                var stringpath = Searchstrategy_ASTAR(Start, Objetive, false);
+
+                ExecPath(stringpath);
+
+                /*si ya se encuentra en su punto de partida y ha terminado todas las tareas
+                    entra en estado de espera de tareas*/
+                _function = "wait";
+            }
+
+            return;
+                
         }
 
         UpdateSensors();
