@@ -12,7 +12,7 @@ var CMothership = function (Params, AgentSpeed) {
 
     //ATTRIBUTES
     var _Tasks;
-    var _Agent;
+    var _Agents;
 
     //INITIALIZE
     init();
@@ -20,14 +20,40 @@ var CMothership = function (Params, AgentSpeed) {
     //PROCEDURES
     function init() {
         _Tasks = new Array();
+        _Agents = new Array()
 
-        _Agent = new CAgent(Params, _Tasks, AgentSpeed, true);
+        _Agents.push(new CAgent(Params, _Tasks, AgentSpeed, Params.NodeSTART, true));
+        _Agents.push(new CAgent(Params, _Tasks, AgentSpeed, new position(1, 0), true));
+
     }
 
     //METHODS
-    this.Agent = function () {
-        return _Agent
+    this.Play = function () {
+        for (var i = 0; i < _Agents.length; i++) {
+            _Agents[i].Play();
+        }    
     };
-   
+
+    this.ChangeSpeed = function (speed) {
+        for (var i = 0; i < _Agents.length; i++) {
+            _Agents[i].ChangeSpeed(speed);
+        }
+    };
+
+    this.Pause = function (speed) {
+        for (var i = 0; i < _Agents.length; i++) {
+            _Agents[i].Pause();
+        }
+    };
+
+    this.Rev = function (speed) {
+        for (var i = 0; i < _Agents.length; i++) {
+            _Agents[i].Rev();
+        }
+    };
+
+    this.Move = function (accion) {
+        _Agents[0].Move(accion);
+    };   
 
 };
