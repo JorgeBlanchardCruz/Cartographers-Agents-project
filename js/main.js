@@ -194,7 +194,7 @@ function Play() {
 
 function ChangeSpeed() {
     if (MotherSHIP == null)
-        return undefined;
+        return;
 
     switch (AgentSpeed) {
         case 0.05:

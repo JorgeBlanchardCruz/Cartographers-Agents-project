@@ -97,7 +97,7 @@ var CAgent = function (Params, Tasks, speed, Position, ActiveCollisions) {
     init();
 
     //PROCEDURES
-    // Converts from radians to degrees.
+    // Funciones matemáticas----------------------
     Math.degrees = function (radians) {
         return radians * 180 / Math.PI;
     };
@@ -109,6 +109,7 @@ var CAgent = function (Params, Tasks, speed, Position, ActiveCollisions) {
     Math.floattoint = function (value) {
         return value | 0;
     }
+    //////////////////////////////////////////////
 
     function init() {
         obj_position = document.getElementById('info1');
@@ -218,6 +219,25 @@ var CAgent = function (Params, Tasks, speed, Position, ActiveCollisions) {
         obj_position.innerHTML = '<small> agent (z,x): ' + _Visualobj.position.z.toFixed(2).toString() + ' ; ' + _Visualobj.position.x.toFixed(2).toString() + '</small>';       
     }
 
+    function Swing() {
+        //provoca una pequeña animación de arriba-abajo a Wheatley
+        if (_countswing <= _MAXSWING) {
+            _Visualobj.position.y += (_dirswing == false ? _SWINGSPEED : _SWINGSPEED * (-1));
+            _countswing += _SWINGSPEED;
+        }
+        else {
+            _dirswing = (_dirswing == false ? true : false);
+            _countswing = 0
+        }
+    }
+
+    function animate() {
+        requestAnimationFrame(animate);
+
+        if (_Visualobj != null) AccionAnimation();
+    }
+
+    //IA------------------------------------------------------------------------------
     function BlockbyBlock() {
         var newspeed = (_distanceNewblock < _speed ? _distanceNewblock : _speed);
 
@@ -226,7 +246,7 @@ var CAgent = function (Params, Tasks, speed, Position, ActiveCollisions) {
             _Visualobj.translateZ(translate);
             _distanceNewblock -= newspeed;
         }
-        else {      
+        else {
             _movement = 'stop';
             _Visualobj.position.set(Number(_Visualobj.position.x.toFixed(0)), _Visualobj.position.y, Number(_Visualobj.position.z.toFixed(0)));
             _currentblock = new position(_Visualobj.position.z, _Visualobj.position.x);
@@ -235,7 +255,7 @@ var CAgent = function (Params, Tasks, speed, Position, ActiveCollisions) {
                 Params.MAPMatrix[_Visualobj.position.z][_Visualobj.position.x] = _BLOCKVISITED;
                 Create_markerCalc(_Visualobj.position.z, _Visualobj.position.x);
             }
-            
+
 
             _Visualobj.translateZ(0);
 
@@ -246,141 +266,6 @@ var CAgent = function (Params, Tasks, speed, Position, ActiveCollisions) {
         }
 
         return;
-    }
-
-    function Autonomy() {
-        if (_function != 'autonomy')
-            return undefined;
-
-        function UpdateSensors() {
-            var z = _Visualobj.position.z;
-            var x = _Visualobj.position.x;
-            _sensors._up = (z > 0 ? Params.MAPMatrix[z - 1][x] : _BLOCKEXIT);
-            _sensors._down = (z < Params.height - 1 ? Params.MAPMatrix[z + 1][x] : _BLOCKEXIT);
-            _sensors._right = (x < Params.width - 1 ? Params.MAPMatrix[z][x + 1] : _BLOCKEXIT);
-            _sensors._left = (x > 0 ? Params.MAPMatrix[z][x - 1] : _BLOCKEXIT);
-            //_sensors._upperrightdiagonal = (z > 0 && x < Params.width - 1 ? Params.MAPMatrix[z - 1][x + 1] : _BLOCKEXIT);
-            //_sensors._upperleftdiagonal = (z > 0 && x > 0 ? Params.MAPMatrix[z - 1][x - 1] : _BLOCKEXIT);
-            //_sensors._lowerrightdiagonal = (z < Params.height - 1 && x < Params.width - 1 ? Params.MAPMatrix[z + 1][x + 1] : _BLOCKEXIT);
-            //_sensors._lowerleftdiagonal = (z < Params.height - 1 && x > 0 ? Params.MAPMatrix[z + 1][x - 1] : _BLOCKEXIT);
-        }
-
-        function CreateTasks(mov) {
-            /*debe dejar tareas por hacer de los lugares que no visita,
-                sin contar por el que está apunto de abordar.
-            */
-            if (Up && mov != 'Up') {
-                Tasks.push(new task(new position(currentpos.z - 1, currentpos.x), 0));
-            }                
-
-            if (Down && mov != 'Down') {
-                Tasks.push(new task(new position(currentpos.z + 1, currentpos.x), 0));
-            }                
-
-            if (Right && mov != 'Right') {
-                Tasks.push(new task(new position(currentpos.z, currentpos.x + 1), 90));
-            }                
-
-            if (Left && mov != 'Left') {
-                Tasks.push(new task(new position(currentpos.z, currentpos.x - 1), 270));
-            }                
-        }
-
-        function Bound() {
-            /* Sirve para eliminar todas las tareas por las que su posición ya se haya pasado.
-            Tareas obsoletas.
-            */
-            for (var i = 0; i < Tasks.length; i++) {
-                var state = Params.MAPMatrix[Tasks[i]._position.z][Tasks[i]._position.x];
-                if (state == _BLOCKVISITED) {
-                    Tasks.splice(i, 1);
-                    i--;
-                }
-            }
-        }
-
-        UpdateSensors();
-
-        var movement = "stop";
-        var currentpos = new position(_Visualobj.position.z, _Visualobj.position.x);
-        var Up = (_sensors._up == _BLOCKFREE ? 1 : 0);
-        var Down = (_sensors._down == _BLOCKFREE ? 1 : 0);
-        var Right = (_sensors._right == _BLOCKFREE ? 1 : 0);
-        var Left = (_sensors._left == _BLOCKFREE ? 1 : 0);
-
-        if (Up) { // siempre tenderá a ir hacia arriba
-            CreateTasks('Up');
-
-            _direction = 180;
-            _Visualobj.rotation.y = Math.radians(_direction);
-            movement = "w";
-        }
-        else if (Down) { //luego tenderá a ir abajo
-            CreateTasks('Down');
-
-            _direction = 0;
-            _Visualobj.rotation.y = Math.radians(_direction);
-            movement = "w";
-        }
-        else if (Right) { 
-            CreateTasks('Right');
-
-            _direction = 90;
-            _Visualobj.rotation.y = Math.radians(_direction);
-            movement = "w";
-        }
-        else if (Left) {
-            CreateTasks('Left');
-
-            _direction = 270;
-            _Visualobj.rotation.y = Math.radians(_direction);
-            movement = "w";
-        }
-    
-        if (movement == "stop") { // no hay movimiento posible
-            /*busca en las tareas. En caso de que exista tarea por realizar, 
-            ejecutará A* para determinar la ruta mínima de los caminos visitados y llegar hasta la posición de la tarea.*/
-
-            Bound();
-
-            var Start = new position(_Visualobj.position.z, _Visualobj.position.x);
-            var Objetive;
-            if (Tasks.length > 0) { //si hay tareas pendientes
-                do {
-                    var maketask = Tasks[Tasks.length - 1]; //recoge la ultima que su posición sea diferente a la actual
-                    /*se recoge la última por que se supone más cercana a la posición actual*/
-                    Objetive = new position(maketask._position.z, maketask._position.x);
-
-                    if (Start.equal(Objetive))
-                        Tasks.pop();
-
-                } while (Start.equal(Objetive) && Tasks.length > 0);
-            }
-            else
-                Objetive = _Startpos; //sino, vuelve a su punto de partida.
-
-            var stringpath = Searchstrategy_ASTAR(Start, Objetive, false); //Busca camino mínimo hasta la tarea
-            if (stringpath != "") //si existe el camino
-                Tasks.pop(); //ahora es cuando eliminamos la tarea pendiente.
-            else { // sino existe
-                stringpath = Searchstrategy_ASTAR(Start, _Startpos, false); //vuelve a su punto de partida.
-            }
-
-            if (stringpath != "") { 
-                setPath("minimum_path", stringpath);
-                
-                _direction = 0;
-                _Visualobj.rotation.y = Math.radians(_direction);
-                _function = "path";
-                movement = _function;
-            }
-            else { //si ya se encuentra en su punto de partida y ha terminado todas las tareas
-                //entra en estado de espera de tareas
-                _function = "wait";
-            }
-        }
-
-        Move(movement);
     }
 
     function Borders_Delimeters() {
@@ -408,7 +293,7 @@ var CAgent = function (Params, Tasks, speed, Position, ActiveCollisions) {
             _movement = 'stop'
             _Path.reset();
         }
-            
+
         _movement = (possible == false ? 'stop' : _movement);
         return possible;
     }
@@ -418,7 +303,7 @@ var CAgent = function (Params, Tasks, speed, Position, ActiveCollisions) {
         //unificar los 4 bloques de código de colisión en una sola función dejaría dicha función con un montón de parámetros de entrada.
         //casi es mejor dejarlo así, tal vez sea más entendible, aunque complicado de modificar.
 
-        for (var i = 0, l = Params.scene.children.length; i < l; i++) {      
+        for (var i = 0, l = Params.scene.children.length; i < l; i++) {
             if (Params.scene.children[i].name == Params.typesblocks[0]) { //Params.typesblocks.[0] = 'obstacle'
                 var object = Params.scene.children[i];
 
@@ -428,7 +313,7 @@ var CAgent = function (Params, Tasks, speed, Position, ActiveCollisions) {
                         //mismo eje de movimiento y sentido correcto
                         if ((_Visualobj.position.x.toFixed(0) == object.position.x.toFixed(0)) && (_Visualobj.position.z < object.position.z)) {
 
-                            var distance = object.position.z - _Visualobj.position.z; 
+                            var distance = object.position.z - _Visualobj.position.z;
                             if (distance < 1) { //desechamos los lejanos
                                 var distancetoObstacle = (object.position.z - (object.scale.z / 2)) - (_Visualobj.position.z + (_SIZE / 2));
                                 if (distancetoObstacle <= 0.0) { //comprobamos la distancia del cercano
@@ -623,24 +508,6 @@ var CAgent = function (Params, Tasks, speed, Position, ActiveCollisions) {
         }
 
         return true;
-    }
-
-    function Swing() {
-        //provoca una pequeña animación de arriba-abajo a Wheatley
-        if (_countswing <= _MAXSWING) {
-            _Visualobj.position.y += (_dirswing == false ? _SWINGSPEED : _SWINGSPEED * (-1));
-            _countswing += _SWINGSPEED;
-        }
-        else {
-            _dirswing = (_dirswing == false ? true : false);
-            _countswing = 0
-        }
-    }
-
-    function animate() {
-        requestAnimationFrame(animate);
-
-        if (_Visualobj != null) AccionAnimation();
     }
 
     function Searchstrategy_ASTAR(START, OBJETIVE, Mapcalculation) {
@@ -904,6 +771,154 @@ var CAgent = function (Params, Tasks, speed, Position, ActiveCollisions) {
 
         return "";
     }
+
+    function Autonomy() {
+        if (_function != 'autonomy')
+            return;
+
+        function UpdateSensors() {
+            var z = _Visualobj.position.z;
+            var x = _Visualobj.position.x;
+            _sensors._up = (z > 0 ? Params.MAPMatrix[z - 1][x] : _BLOCKEXIT);
+            _sensors._down = (z < Params.height - 1 ? Params.MAPMatrix[z + 1][x] : _BLOCKEXIT);
+            _sensors._right = (x < Params.width - 1 ? Params.MAPMatrix[z][x + 1] : _BLOCKEXIT);
+            _sensors._left = (x > 0 ? Params.MAPMatrix[z][x - 1] : _BLOCKEXIT);
+            //_sensors._upperrightdiagonal = (z > 0 && x < Params.width - 1 ? Params.MAPMatrix[z - 1][x + 1] : _BLOCKEXIT);
+            //_sensors._upperleftdiagonal = (z > 0 && x > 0 ? Params.MAPMatrix[z - 1][x - 1] : _BLOCKEXIT);
+            //_sensors._lowerrightdiagonal = (z < Params.height - 1 && x < Params.width - 1 ? Params.MAPMatrix[z + 1][x + 1] : _BLOCKEXIT);
+            //_sensors._lowerleftdiagonal = (z < Params.height - 1 && x > 0 ? Params.MAPMatrix[z + 1][x - 1] : _BLOCKEXIT);
+        }
+
+        function Decision() {
+
+            function CreateTasks(mov) {
+                /*debe dejar tareas por hacer de los lugares que no visita,
+                    sin contar por el que está apunto de abordar.
+                */
+                if (Up && mov != 'Up') {
+                    Tasks.push(new task(new position(currentpos.z - 1, currentpos.x), 0));
+                }
+
+                if (Down && mov != 'Down') {
+                    Tasks.push(new task(new position(currentpos.z + 1, currentpos.x), 0));
+                }
+
+                if (Right && mov != 'Right') {
+                    Tasks.push(new task(new position(currentpos.z, currentpos.x + 1), 90));
+                }
+
+                if (Left && mov != 'Left') {
+                    Tasks.push(new task(new position(currentpos.z, currentpos.x - 1), 270));
+                }
+            }
+
+            var movement = "stop";
+            var currentpos = new position(_Visualobj.position.z, _Visualobj.position.x);
+            var Up = (_sensors._up == _BLOCKFREE ? 1 : 0);
+            var Down = (_sensors._down == _BLOCKFREE ? 1 : 0);
+            var Right = (_sensors._right == _BLOCKFREE ? 1 : 0);
+            var Left = (_sensors._left == _BLOCKFREE ? 1 : 0);
+
+            if (Up) { // siempre tenderá a ir hacia arriba
+                CreateTasks('Up');
+
+                _direction = 180;
+                _Visualobj.rotation.y = Math.radians(_direction);
+                movement = "w";
+            }
+            else if (Down) { //luego tenderá a ir abajo
+                CreateTasks('Down');
+
+                _direction = 0;
+                _Visualobj.rotation.y = Math.radians(_direction);
+                movement = "w";
+            }
+            else if (Right) {
+                CreateTasks('Right');
+
+                _direction = 90;
+                _Visualobj.rotation.y = Math.radians(_direction);
+                movement = "w";
+            }
+            else if (Left) {
+                CreateTasks('Left');
+
+                _direction = 270;
+                _Visualobj.rotation.y = Math.radians(_direction);
+                movement = "w";
+            }
+        }
+
+        function TaskManager() {
+
+            function Bound() {
+                /* Sirve para eliminar todas las tareas por las que su posición ya se haya pasado.
+                Tareas obsoletas.
+                */
+                for (var i = 0; i < Tasks.length; i++) {
+                    var state = Params.MAPMatrix[Tasks[i]._position.z][Tasks[i]._position.x];
+                    if (state == _BLOCKVISITED) {
+                        Tasks.splice(i, 1);
+                        i--;
+                    }
+                }
+            }
+
+            if (movement == "stop") { // no hay movimiento posible
+                /*busca en las tareas. En caso de que exista tarea por realizar, 
+                ejecutará A* para determinar la ruta mínima de los caminos visitados y llegar hasta la posición de la tarea.*/
+
+                Bound(); //Eliminar tareas obsoletas.
+
+                var Start = new position(_Visualobj.position.z, _Visualobj.position.x);
+                var Objetive;
+                if (Tasks.length > 0) { //si hay tareas pendientes
+                    do {
+                        var maketask = Tasks[Tasks.length - 1]; //recoge la ultima que su posición sea diferente a la actual
+                        /*se recoge la última por que se supone más cercana a la posición actual*/
+                        Objetive = new position(maketask._position.z, maketask._position.x);
+
+                        if (Start.equal(Objetive))
+                            Tasks.pop();
+
+                    } while (Start.equal(Objetive) && Tasks.length > 0);
+                }
+                else
+                    Objetive = _Startpos; //sino, vuelve a su punto de partida.
+
+                var stringpath = Searchstrategy_ASTAR(Start, Objetive, false); //Busca camino mínimo hasta la tarea
+                if (stringpath != "") //si existe el camino
+                    Tasks.pop(); //ahora es cuando eliminamos la tarea pendiente.
+                else { // sino existe
+                    stringpath = Searchstrategy_ASTAR(Start, _Startpos, false); //vuelve a su punto de partida.
+                }
+
+                if (stringpath != "") {
+                    setPath("minimum_path", stringpath);
+
+                    _direction = 0;
+                    _Visualobj.rotation.y = Math.radians(_direction);
+                    _function = "path";
+                    movement = _function;
+                }
+                else { //si ya se encuentra en su punto de partida y ha terminado todas las tareas
+                    //entra en estado de espera de tareas
+                    _function = "wait";
+                }
+            }
+
+        }
+
+        UpdateSensors();
+
+        Decision();
+
+        TaskManager();
+
+        Move(movement);
+    }
+    //////////////////////////////////////////////////////////////////////////////////
+
 
     function setPath(name, agentpath) {
         _Path = new path(name, agentpath);
