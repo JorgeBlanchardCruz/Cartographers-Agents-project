@@ -10,6 +10,7 @@
 window.onload = main;
 
 
+//STRUCTURES
 function position(z, x) {
     this.z = z;
     this.x = x;
@@ -60,7 +61,13 @@ function position(z, x) {
     }
 };
 
+function task(pos, direction) {
+    this._position = new position(pos.z, pos.x);
+    this._direction = direction;
+};
 
+
+//ATTRIBUTES
 var MapCAVE;
 var MotherSHIP;
 
@@ -78,7 +85,6 @@ var AgentSpeed = 0.05;
     var chbAntialiasing;
     var chbTexturas;
     var chbMapcalculation;
-    var btnCalcASTAR;
     var btnPlay;
     var btnPlayFast;
     var btnPause;
@@ -97,7 +103,6 @@ function main() {
 
 //PROCEDURES
 function set_HTMLObjects() {
-    btnCalcASTAR = document.getElementById('btnCalcASTAR');
     btnPlay = document.getElementById('btnPlay');
     btnPlayFast = document.getElementById('btnPlayFast');
     btnPause = document.getElementById('btnPause');
@@ -119,10 +124,9 @@ function set_HTMLObjects() {
 
 function Add_Events() {
 
-    document.addEventListener('keypress', document_onkeypress, false);
+    //document.addEventListener('keypress', document_onkeypress, false);
     window.addEventListener('resize', onWindowResize, false);
 
-    btnCalcASTAR.addEventListener('click', CalculateASTAR);
     btnPlay.addEventListener('click', Play);
     btnPlayFast.addEventListener('click', ChangeSpeed);
     btnPause.addEventListener('click', Pause);
@@ -181,13 +185,9 @@ function AgentMove(key) {
         MotherSHIP.Agent().Move(key);
 }
 
-function CalculateASTAR() {
-    if (MotherSHIP != null)
-        MotherSHIP.CalculateASTAR(Mapcalculation);
-}
-
 function Play() {
-    AgentMove('i');
+    if (MotherSHIP != null)
+        MotherSHIP.Agent().Play();
 }
 
 function ChangeSpeed() {
@@ -208,7 +208,8 @@ function ChangeSpeed() {
 }
 
 function Pause() {
-    AgentMove('stop');
+    if (MotherSHIP != null)
+        MotherSHIP.Agent().Pause();
 }
 
 function Rev() {

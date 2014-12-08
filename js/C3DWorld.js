@@ -18,10 +18,11 @@ var C3DWorld = function (Antialias, OceanScene) {
     };
 
     //ATTRIBUTES
-    const SEP_COORD = ',';
-    const SET_TYPE = ';';
-    const COLOR_BACKGROUNDSCENE = '#BDE6F2';
-    const LIMAP_CONTENT = 4;
+    const _SEP_COORD = ',';
+    const _SET_TYPE = ';';
+    const _COLOR_BACKGROUNDSCENE = '#BDE6F2';
+    const _LIMAP_CONTENT = 4;
+    const _BLOCKFREE = -1;
 
         //Objetos para la escena
         var _container;
@@ -54,7 +55,7 @@ var C3DWorld = function (Antialias, OceanScene) {
         _renderer = new THREE.WebGLRenderer({ antialias: Antialias }); //inicializar Three.js
         _renderer.setSize(window.innerWidth, window.innerHeight);
         //_renderer.shadowMapType = THREE.PCFSoftShadowMap;
-        _renderer.setClearColor(COLOR_BACKGROUNDSCENE, 1);
+        _renderer.setClearColor(_COLOR_BACKGROUNDSCENE, 1);
 
         _renderer.domElement.id = "RenderdomElement";
         document.body.appendChild(_renderer.domElement);
@@ -88,7 +89,7 @@ var C3DWorld = function (Antialias, OceanScene) {
             new Block('suelo', _TypeBlock[2], 'meshes/rock3.jpg', '#91683C', 0.25),
             new Block('pared', _TypeBlock[0], 'meshes/rock.jpg', '#6B5A37', 1),
             new Block('escombros', _TypeBlock[1], 'meshes/plywood.jpg', '#F2D21D', 1),
-            new Block('pozo', _TypeBlock[0], 'meshes/water.jpg', '#3D85B3', 0.1)
+            new Block('pozo', _TypeBlock[0], 'meshes/water.jpg', '#3D85B3', 0.1),
         ];
     }
 
@@ -392,11 +393,11 @@ var C3DWorld = function (Antialias, OceanScene) {
         }
 
         //leemos linea a linea del fichero de texto y eliminamos los bloques encontrados
-        for (var i = LIMAP_CONTENT; i < content.length; i++) {
+        for (var i = _LIMAP_CONTENT; i < content.length; i++) {
             var line = content[i];
-            var z = Number(line.substring(0, line.lastIndexOf(SEP_COORD)));
-            var x = Number(line.substring(line.lastIndexOf(SEP_COORD) + 1, line.lastIndexOf(SET_TYPE)));
-            var type = Number(line.substring(line.lastIndexOf(SET_TYPE) + 1, line.length));
+            var z = Number(line.substring(0, line.lastIndexOf(_SEP_COORD)));
+            var x = Number(line.substring(line.lastIndexOf(_SEP_COORD) + 1, line.lastIndexOf(_SET_TYPE)));
+            var type = Number(line.substring(line.lastIndexOf(_SET_TYPE) + 1, line.length));
 
             var id = Number('10' + Number(z) + '10' + Number(x));
             var selectedObject = _scene.getObjectById(id);
@@ -414,17 +415,17 @@ var C3DWorld = function (Antialias, OceanScene) {
         for (var z = 0; z < _MapHeight; z++) {
             var row = new Array()
             for (var x = 0; x < _MapWidth; x++)
-                row.push(-1);
+                row.push(_BLOCKFREE);
 
             _MAPMatrix.push(row);
         }
 
         //leemos linea a linea del fichero de texto e insertamos los bloques encontrados
-        for (var i = LIMAP_CONTENT; i < content.length; i++) {
+        for (var i = _LIMAP_CONTENT; i < content.length; i++) {
             var line = content[i];
-            var z = Number(line.substring(0, line.lastIndexOf(SEP_COORD)));
-            var x = Number(line.substring(line.lastIndexOf(SEP_COORD) + 1, line.lastIndexOf(SET_TYPE)));
-            var type = Number(line.substring(line.lastIndexOf(SET_TYPE) + 1, line.length));
+            var z = Number(line.substring(0, line.lastIndexOf(_SEP_COORD)));
+            var x = Number(line.substring(line.lastIndexOf(_SEP_COORD) + 1, line.lastIndexOf(_SET_TYPE)));
+            var type = Number(line.substring(line.lastIndexOf(_SET_TYPE) + 1, line.length));
 
             var y = (_Blocks[type]._height < 1 ? -0.25 - _Blocks[type]._height : 0);
 
@@ -512,7 +513,7 @@ var C3DWorld = function (Antialias, OceanScene) {
             Create_cubeBlock(_Blocks[0], width, height, (width / 2) - 1, -0.5, (height / 2) - 1, Textures);
 
             //recoge la posición del agente (z,x)
-            _NodeSTART = new position(Number(content[2].substring(0, content[2].lastIndexOf(SEP_COORD))), Number(content[2].substring(content[2].lastIndexOf(SEP_COORD) + 1, content.length - 1)));
+            _NodeSTART = new position(Number(content[2].substring(0, content[2].lastIndexOf(_SEP_COORD))), Number(content[2].substring(content[2].lastIndexOf(_SEP_COORD) + 1, content.length - 1)));
             //_NodeOBJETIVE = new position(1, 0);
 
             //recoge la trayectoria del agente

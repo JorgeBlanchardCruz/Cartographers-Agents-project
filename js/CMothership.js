@@ -7,33 +7,27 @@
 
 var CMothership = function (Params, AgentSpeed) {
 
+    //STRUCTURES
+
+
+    //ATTRIBUTES
+    var _Tasks;
     var _Agent;
-    var Pathjs, PathCSHarp;
 
     //INITIALIZE
     init();
 
     //PROCEDURES
     function init() {
-        _Agent = new CAgent(Params, AgentSpeed, true);
+        _Tasks = new Array();
 
-        PathCSHarp = Params.path;
-
-        _Agent.setPath("CSharp", PathCSHarp);
+        _Agent = new CAgent(Params, _Tasks, AgentSpeed, true);
     }
 
     //METHODS
-    this.Agent = function () { return _Agent };
-
-    this.CalculateASTAR = function (Mapcalculation) {
-        if (_Agent == null) return;
-
-        Pathjs = _Agent.Searchstrategy_ASTAR(Params.NodeSTART, Params.NodeOBJETIVE, Mapcalculation);
-
-        _Agent.setPath("javascript", Pathjs);
-
-        alert("Se ha terminado el proceso de calculo A*");
-    }
-    
+    this.Agent = function () {
+        return _Agent
+    };
+   
 
 };

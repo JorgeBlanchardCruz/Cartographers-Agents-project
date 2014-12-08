@@ -7,8 +7,7 @@
 "use strict";
 
 //la dimensión 'y' ha sido bloqueada
-var CAgent = function (Params, speed, ActiveCollisions) {
-
+var CAgent = function (Params, Tasks, speed, ActiveCollisions) {
 
     //STRUCTURES
     function path(name, path) {
@@ -24,10 +23,11 @@ var CAgent = function (Params, speed, ActiveCollisions) {
             if (this._indx < this._path.length - 1) {
                 this._indx++;
 
-                Callback('i');
+                Callback('path');
             }
             else if (this._indx >= this._path.length - 1) {
                 this.reset();
+                Reactor();
             }
                  
         }
@@ -50,29 +50,45 @@ var CAgent = function (Params, speed, ActiveCollisions) {
          }
     }
 
+    function sensor() {
+        this._up      = 0;
+        this._down    = 0;
+        this._right   = 0;
+        this._left    = 0;
+        this._upperrightdiagonal = 0;
+        this._upperleftdiagonal  = 0;
+        this._lowerrightdiagonal = 0;
+        this._lowerleftdiagonal  = 0;
+    }
+    
 
     //ATTRIBUTES
     const _MAXSWING = 0.03;
     const _SWINGSPEED = 0.001;
     const _SIZE = 0.3;
+    const _BLOCKVISITED = 'v';
+    const _BLOCKFREE = -1;
+    const _BLOCKEXIT = 'e';
 
-    var _Visualobj;  //objeto visual en el mundo 3d  
+    var _Startpos = new position(Params.NodeSTART.z, Params.NodeSTART.x);
+    var _Visualobj;  //objeto visual en el mundo 3d 
 
     //SWING
     var _countswing = 0;
     var _dirswing = false;
 
     //movement
-    var _currentblock = Params.NodeSTART;
+    var _currentblock = _Startpos;
     var _distanceNewblock = 0;
     var _speed = speed;
     var _movement = 'stop';
-    var _function = 'autonomy';
+    var _function = 'nothing';
+    var _sensors = new sensor();
     
     var _direction = 0;
 
     //path
-    var _Path;
+    var _Path = new path("null", "");
     
     //temp variable
     var obj_position;
@@ -97,7 +113,9 @@ var CAgent = function (Params, speed, ActiveCollisions) {
     function init() {
         obj_position = document.getElementById('info1');
 
-        Load_objmtl('meshes/WheatleyModel.obj', 'meshes/Ghost.mtl', Params.NodeSTART.x, 0, Params.NodeSTART.z, 0.08, 0.08, 0.08);
+        Load_objmtl('meshes/WheatleyModel.obj', 'meshes/Ghost.mtl', _Startpos.x, 0, _Startpos.z, 0.08, 0.08, 0.08);
+
+        Params.MAPMatrix[_Startpos.z][_Startpos.x] = _BLOCKVISITED;
 
         animate();
     }
@@ -138,17 +156,10 @@ var CAgent = function (Params, speed, ActiveCollisions) {
         Params.scene.add(object);
     }
 
-    function get_typemovement(){
-        if (_direction == 0 || _direction == 180)
-            return "vertical";
-        if (_direction == 90 || _direction == 270)
-            return "horizontal";
-    }
-
     function Move(movement) {
         _movement = movement;
 
-        if (movement == 'i') 
+        if (movement == 'path') 
             _Path.play();
         else 
             _Path.stop();
@@ -215,14 +226,121 @@ var CAgent = function (Params, speed, ActiveCollisions) {
             _movement = 'stop';
             _Visualobj.position.set(Number(_Visualobj.position.x.toFixed(0)), _Visualobj.position.y, Number(_Visualobj.position.z.toFixed(0)));
             _currentblock = new position(_Visualobj.position.z, _Visualobj.position.x);
+
+            Params.MAPMatrix[_Visualobj.position.z][_Visualobj.position.x] = _BLOCKVISITED;
+
             _Visualobj.translateZ(0);
+
+            Autonomy();
 
             if (_Path._begin) {
                 _Path.add_indx(Move);
-            }
-
-            //Create_marker(_Visualobj.position.z, _Visualobj.position.x);
+                //Create_marker(_Visualobj.position.z, _Visualobj.position.x);
+            }        
         }
+    }
+
+    function Autonomy() {
+        if (_function != 'autonomy')
+            return undefined;
+
+        function CreateTasks(mov) {
+            /*debe dejar tareas por hacer de los lugares que no visita,
+                sin contar por el que está apunto de abordar.
+            */
+            if (Up && mov != 'Up') {
+                Tasks.push(new task(new position(currentpos.z - 1, currentpos.x), 0));
+            }                
+
+            if (Down && mov != 'Down') {
+                Tasks.push(new task(new position(currentpos.z + 1, currentpos.x), 0));
+            }                
+
+            if (Right && mov != 'Right') {
+                Tasks.push(new task(new position(currentpos.z, currentpos.x + 1), 90));
+            }                
+
+            if (Left && mov != 'Left') {
+                Tasks.push(new task(new position(currentpos.z, currentpos.x - 1), 270));
+            }                
+        }
+
+        UpdateSensors();
+
+        var movement = "";
+        var currentpos = new position(_Visualobj.position.z, _Visualobj.position.x);
+        var Up = (_sensors._up == _BLOCKFREE ? 1 : 0);
+        var Down = (_sensors._down == _BLOCKFREE ? 1 : 0);
+        var Right = (_sensors._right == _BLOCKFREE ? 1 : 0);
+        var Left = (_sensors._left == _BLOCKFREE ? 1 : 0);
+
+        if (Up) { // siempre tenderá a ir hacia arriba
+            CreateTasks('Up');
+
+            _direction = 180;
+            _Visualobj.rotation.y = Math.radians(_direction);
+            movement = "w";
+        }
+        else if (Down) { //luego tenderá a ir abajo
+            CreateTasks('Down');
+
+            _direction = 0;
+            _Visualobj.rotation.y = Math.radians(_direction);
+            movement = "w";
+        }
+        else if (Right) { 
+            CreateTasks('Right');
+
+            _direction = 90;
+            _Visualobj.rotation.y = Math.radians(_direction);
+            movement = "w";
+        }
+        else if (Left) {
+            CreateTasks('Left');
+
+            _direction = 270;
+            _Visualobj.rotation.y = Math.radians(_direction);
+            movement = "w";
+        }
+    
+        if (movement == "") { // no hay movimiento posible
+            /*busca en las tareas. En caso de que exista tarea por realizar, 
+            ejecutará A* para determinar la ruta mínima de los caminos visitados y llegar hasta la posición de la tarea.*/        
+            var Start = new position(_Visualobj.position.z, _Visualobj.position.x);
+            var Objetive;
+            if (Tasks.length > 0) { //si hay tareas pendientes
+                var maketask = Tasks.pop(); //recoge una
+                Objetive = new position(maketask._position.z, maketask._position.x);
+            }
+            else
+                Objetive = _Startpos; //sino, vuelve a su punto de partida.
+
+            var stringpath = Searchstrategy_ASTAR(Start, Objetive, false); //Busca camino mínimo hasta la tarea
+            if (stringpath == "") // sino existe, cosa rara, vuelve a su punto de partida.
+                stringpath = Searchstrategy_ASTAR(Start, _Startpos, false);
+
+            setPath("minimum_path", stringpath);
+
+            _direction = 0;
+            _Visualobj.rotation.y = Math.radians(_direction);
+            movement = "path";
+            _function = "path";
+        }
+
+        Move(movement);
+    }
+
+    function UpdateSensors() {
+        var z = _Visualobj.position.z;
+        var x = _Visualobj.position.x;
+        _sensors._up = (z > 0 ? Params.MAPMatrix[z - 1][x] : _BLOCKEXIT);
+        _sensors._down = (z < Params.height - 1 ? Params.MAPMatrix[z + 1][x] : _BLOCKEXIT);
+        _sensors._right = (x > 0 ? Params.MAPMatrix[z][x + 1] : _BLOCKEXIT);
+        _sensors._left = (x < Params.width - 1 ? Params.MAPMatrix[z][x - 1] : _BLOCKEXIT);
+        _sensors._upperrightdiagonal = (z > 0 && x < Params.width - 1 ? Params.MAPMatrix[z - 1][x + 1] : _BLOCKEXIT);
+        _sensors._upperleftdiagonal = (z > 0 && x > 0 ? Params.MAPMatrix[z - 1][x - 1] : _BLOCKEXIT);
+        _sensors._lowerrightdiagonal = (z < Params.height - 1 && x < Params.width - 1 ? Params.MAPMatrix[z + 1][x + 1] : _BLOCKEXIT);
+        _sensors._lowerleftdiagonal = (z < Params.height - 1 && x > 0 ? Params.MAPMatrix[z + 1][x - 1] : _BLOCKEXIT);
     }
 
     function Borders_Delimeters() {
@@ -471,13 +589,6 @@ var CAgent = function (Params, speed, ActiveCollisions) {
         if (_Visualobj != null) AccionAnimation();
     }
 
-    function Rev() {
-        _Path.reset();
-        _Visualobj.position.set(Params.NodeSTART.x, 0, Params.NodeSTART.z);
-        _direction = 0;
-        _Visualobj.rotation.y = _direction;
-    }
-
     function Searchstrategy_ASTAR(START, OBJETIVE, Mapcalculation) {
 
         function branch(nodes, value, heuristic) {
@@ -525,7 +636,7 @@ var CAgent = function (Params, speed, ActiveCollisions) {
                         anglestart = 90;
                     }
                     
-                } else if (Params.NodeSTART.z != this.nodes[1].z) { //movimiento vertical
+                } else if (_Startpos.z != this.nodes[1].z) { //movimiento vertical
                     mov = "vertical";
                     if (this.nodes[0].z > this.nodes[1].z) { //arriba
                         stringpath = "aaw";
@@ -591,7 +702,8 @@ var CAgent = function (Params, speed, ActiveCollisions) {
             var count_newbranchs = 0;
 
             function AddCalculation(nbranch, z, x, type) {
-                if ((type == -1) || ((type >= 0 && type <= Params.typesblocks.length - 1) && (Params.blocks[type]._type != 'obstacle'))) {
+                //if ((type == -1) || ((type >= 0 && type <= Params.typesblocks.length - 1) && (Params.blocks[type]._type != 'obstacle'))) {
+                if (type == 'v' || type == -1) {
 
                     var newnode = new position(z, x);
                     nbranch.nodes.push(newnode);
@@ -619,7 +731,6 @@ var CAgent = function (Params, speed, ActiveCollisions) {
 
             var newz;
             var newx;
-
 
             /*  2B2.Formar nuevas trayectorias a partir de la trayectoria eliminada de ABIERTA 
             ramificando el último nodo de la misma.  */
@@ -740,12 +851,40 @@ var CAgent = function (Params, speed, ActiveCollisions) {
         return "";
     }
 
-    //METHODS
-    this.Move = function (movement) { Move(movement); };
-
-    this.setPath = function (name, agentpath) {
+    function setPath(name, agentpath) {
         _Path = new path(name, agentpath);
     }
+
+    function Reactor() {
+        _function = 'autonomy';
+        Autonomy();
+    }
+
+
+    function Rev() {
+        _Path.reset();
+        _Visualobj.position.set(_Startpos.x, 0, _Startpos.z);
+        _direction = 0;
+        _Visualobj.rotation.y = _direction;
+    }
+
+
+    //METHODS
+    this.setPath = function (name, agentpath) {
+        setPath(name, agentpath);
+    }
+
+    this.Move = function (accion) {
+        Move(accion);
+    };
+
+    this.Play = function () {
+        Reactor();
+    };
+
+    this.Pause = function () {
+        _function = 'nothing';
+    };
 
     this.Rev = function () {
         Rev();
@@ -753,10 +892,6 @@ var CAgent = function (Params, speed, ActiveCollisions) {
 
     this.ChangeSpeed = function (speed) {
         _speed = speed;
-    }
-
-    this.Searchstrategy_ASTAR = function (START, OBJETIVE, Mapcalculation) {
-        return Searchstrategy_ASTAR(START, OBJETIVE, Mapcalculation);
     }
 
 };
