@@ -28,7 +28,6 @@ Partial Class MFMain
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(MFMain))
         Me.grid = New System.Windows.Forms.DataGridView()
         Me.Panel1 = New System.Windows.Forms.Panel()
-        Me.RichTextBox1 = New System.Windows.Forms.RichTextBox()
         Me.Panel2 = New System.Windows.Forms.Panel()
         Me.FlowLayoutPanel1 = New System.Windows.Forms.FlowLayoutPanel()
         Me.btnSuelo = New System.Windows.Forms.Button()
@@ -65,7 +64,7 @@ Partial Class MFMain
         DataGridViewCellStyle2.BackColor = System.Drawing.Color.FromArgb(CType(CType(145, Byte), Integer), CType(CType(104, Byte), Integer), CType(CType(60, Byte), Integer))
         DataGridViewCellStyle2.Font = New System.Drawing.Font("Segoe UI", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         DataGridViewCellStyle2.ForeColor = System.Drawing.SystemColors.ControlText
-        DataGridViewCellStyle2.SelectionBackColor = System.Drawing.Color.FromArgb(CType(CType(145, Byte), Integer), CType(CType(104, Byte), Integer), CType(CType(60, Byte), Integer))
+        DataGridViewCellStyle2.SelectionBackColor = System.Drawing.Color.FromArgb(CType(CType(107, Byte), Integer), CType(CType(90, Byte), Integer), CType(CType(55, Byte), Integer))
         DataGridViewCellStyle2.SelectionForeColor = System.Drawing.Color.Transparent
         DataGridViewCellStyle2.WrapMode = System.Windows.Forms.DataGridViewTriState.[False]
         Me.grid.DefaultCellStyle = DataGridViewCellStyle2
@@ -104,7 +103,6 @@ Partial Class MFMain
         'Panel1
         '
         Me.Panel1.BackColor = System.Drawing.Color.FromArgb(CType(CType(57, Byte), Integer), CType(CType(57, Byte), Integer), CType(CType(57, Byte), Integer))
-        Me.Panel1.Controls.Add(Me.RichTextBox1)
         Me.Panel1.Controls.Add(Me.Panel2)
         Me.Panel1.Controls.Add(Me.btnMapCreate)
         Me.Panel1.Dock = System.Windows.Forms.DockStyle.Left
@@ -114,15 +112,6 @@ Partial Class MFMain
         Me.Panel1.Padding = New System.Windows.Forms.Padding(5)
         Me.Panel1.Size = New System.Drawing.Size(78, 952)
         Me.Panel1.TabIndex = 1
-        '
-        'RichTextBox1
-        '
-        Me.RichTextBox1.Font = New System.Drawing.Font("Segoe UI", 6.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.RichTextBox1.Location = New System.Drawing.Point(8, 73)
-        Me.RichTextBox1.Name = "RichTextBox1"
-        Me.RichTextBox1.Size = New System.Drawing.Size(60, 96)
-        Me.RichTextBox1.TabIndex = 2
-        Me.RichTextBox1.Text = ""
         '
         'Panel2
         '
@@ -209,7 +198,7 @@ Partial Class MFMain
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.BackColor = System.Drawing.Color.WhiteSmoke
-        Me.ClientSize = New System.Drawing.Size(1021, 952)
+        Me.ClientSize = New System.Drawing.Size(981, 952)
         Me.Controls.Add(Me.Panel3)
         Me.Controls.Add(Me.grid)
         Me.Controls.Add(Me.Panel1)
@@ -235,6 +224,5 @@ Partial Class MFMain
     Friend WithEvents btnSuelo As System.Windows.Forms.Button
     Friend WithEvents btnPared As System.Windows.Forms.Button
     Friend WithEvents grid As System.Windows.Forms.DataGridView
-    Friend WithEvents RichTextBox1 As System.Windows.Forms.RichTextBox
 
 End Class

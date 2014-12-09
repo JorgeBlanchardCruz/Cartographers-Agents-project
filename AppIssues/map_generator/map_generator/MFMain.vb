@@ -42,7 +42,7 @@ Public Class MFMain
         End Try
     End Sub
 
-    Public Sub MakeGridViewDoubleBuffered(ByVal dgv As DataGridView)
+    Private Sub MakeGridViewDoubleBuffered(ByVal dgv As DataGridView)
         Dim dgvType As Type = dgv.[GetType]()
         Dim pi As PropertyInfo = dgvType.GetProperty("DoubleBuffered", BindingFlags.Instance Or BindingFlags.NonPublic)
         pi.SetValue(dgv, True, Nothing)
@@ -74,9 +74,16 @@ Public Class MFMain
     Private Sub grid_CellMouseDown(sender As Object, e As DataGridViewCellMouseEventArgs) Handles grid.CellMouseDown
         Painting = True
 
+        If (e.RowIndex > -1) And (e.ColumnIndex > -1) Then
+            Me.grid.Rows(e.RowIndex).Cells(e.ColumnIndex).Style.BackColor = SelectedColor
+        End If
     End Sub
 
     Private Sub grid_CellMouseEnter(sender As Object, e As DataGridViewCellEventArgs) Handles grid.CellMouseEnter
+
+    End Sub
+
+    Private Sub grid_CellMouseLeave(sender As Object, e As DataGridViewCellEventArgs) Handles grid.CellMouseLeave
         If (Not Painting) Then
             Exit Sub
         End If
@@ -92,6 +99,8 @@ Public Class MFMain
 
 
 #End Region
+
+
 
 
 
