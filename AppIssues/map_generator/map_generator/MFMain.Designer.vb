@@ -28,28 +28,29 @@ Partial Class MFMain
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(MFMain))
         Me.grid = New System.Windows.Forms.DataGridView()
         Me.Panel1 = New System.Windows.Forms.Panel()
+        Me.btnSave = New System.Windows.Forms.Button()
         Me.Panel2 = New System.Windows.Forms.Panel()
         Me.FlowLayoutPanel1 = New System.Windows.Forms.FlowLayoutPanel()
         Me.btnSuelo = New System.Windows.Forms.Button()
         Me.btnPared = New System.Windows.Forms.Button()
         Me.btnMapCreate = New System.Windows.Forms.Button()
         Me.pnlMapCreate = New System.Windows.Forms.Panel()
-        Me.txtHeight = New System.Windows.Forms.NumericUpDown()
+        Me.Panel3 = New System.Windows.Forms.Panel()
         Me.Label1 = New System.Windows.Forms.Label()
+        Me.btnMapCreate_OK = New System.Windows.Forms.Button()
+        Me.txtHeight = New System.Windows.Forms.NumericUpDown()
         Me.Label2 = New System.Windows.Forms.Label()
         Me.txtWidth = New System.Windows.Forms.NumericUpDown()
-        Me.btnMapCreate_OK = New System.Windows.Forms.Button()
-        Me.Panel3 = New System.Windows.Forms.Panel()
         Me.SplitContainer = New System.Windows.Forms.SplitContainer()
-        Me.btnSave = New System.Windows.Forms.Button()
+        Me.btnAgente = New System.Windows.Forms.Button()
         CType(Me.grid, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.Panel1.SuspendLayout()
         Me.Panel2.SuspendLayout()
         Me.FlowLayoutPanel1.SuspendLayout()
         Me.pnlMapCreate.SuspendLayout()
+        Me.Panel3.SuspendLayout()
         CType(Me.txtHeight, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.txtWidth, System.ComponentModel.ISupportInitialize).BeginInit()
-        Me.Panel3.SuspendLayout()
         CType(Me.SplitContainer, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SplitContainer.Panel1.SuspendLayout()
         Me.SplitContainer.Panel2.SuspendLayout()
@@ -79,9 +80,9 @@ Partial Class MFMain
         DataGridViewCellStyle2.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft
         DataGridViewCellStyle2.BackColor = System.Drawing.Color.FromArgb(CType(CType(145, Byte), Integer), CType(CType(104, Byte), Integer), CType(CType(60, Byte), Integer))
         DataGridViewCellStyle2.Font = New System.Drawing.Font("Segoe UI", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        DataGridViewCellStyle2.ForeColor = System.Drawing.SystemColors.ControlText
+        DataGridViewCellStyle2.ForeColor = System.Drawing.Color.FromArgb(CType(CType(107, Byte), Integer), CType(CType(90, Byte), Integer), CType(CType(55, Byte), Integer))
         DataGridViewCellStyle2.SelectionBackColor = System.Drawing.Color.FromArgb(CType(CType(107, Byte), Integer), CType(CType(90, Byte), Integer), CType(CType(55, Byte), Integer))
-        DataGridViewCellStyle2.SelectionForeColor = System.Drawing.Color.Transparent
+        DataGridViewCellStyle2.SelectionForeColor = System.Drawing.Color.FromArgb(CType(CType(107, Byte), Integer), CType(CType(90, Byte), Integer), CType(CType(55, Byte), Integer))
         DataGridViewCellStyle2.WrapMode = System.Windows.Forms.DataGridViewTriState.[False]
         Me.grid.DefaultCellStyle = DataGridViewCellStyle2
         Me.grid.EnableHeadersVisualStyles = False
@@ -130,6 +131,23 @@ Partial Class MFMain
         Me.Panel1.Size = New System.Drawing.Size(79, 952)
         Me.Panel1.TabIndex = 1
         '
+        'btnSave
+        '
+        Me.btnSave.Dock = System.Windows.Forms.DockStyle.Top
+        Me.btnSave.FlatAppearance.BorderSize = 0
+        Me.btnSave.FlatAppearance.MouseDownBackColor = System.Drawing.Color.CadetBlue
+        Me.btnSave.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(CType(CType(42, Byte), Integer), CType(CType(42, Byte), Integer), CType(CType(42, Byte), Integer))
+        Me.btnSave.FlatStyle = System.Windows.Forms.FlatStyle.Flat
+        Me.btnSave.Font = New System.Drawing.Font("Segoe UI", 9.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.btnSave.ForeColor = System.Drawing.Color.Gainsboro
+        Me.btnSave.Location = New System.Drawing.Point(5, 46)
+        Me.btnSave.Margin = New System.Windows.Forms.Padding(2, 3, 2, 3)
+        Me.btnSave.Name = "btnSave"
+        Me.btnSave.Size = New System.Drawing.Size(69, 41)
+        Me.btnSave.TabIndex = 2
+        Me.btnSave.Text = "Guardar"
+        Me.btnSave.UseVisualStyleBackColor = True
+        '
         'Panel2
         '
         Me.Panel2.BackColor = System.Drawing.Color.FromArgb(CType(CType(95, Byte), Integer), CType(CType(81, Byte), Integer), CType(CType(69, Byte), Integer))
@@ -146,6 +164,7 @@ Partial Class MFMain
         Me.FlowLayoutPanel1.BackColor = System.Drawing.Color.FromArgb(CType(CType(57, Byte), Integer), CType(CType(57, Byte), Integer), CType(CType(57, Byte), Integer))
         Me.FlowLayoutPanel1.Controls.Add(Me.btnSuelo)
         Me.FlowLayoutPanel1.Controls.Add(Me.btnPared)
+        Me.FlowLayoutPanel1.Controls.Add(Me.btnAgente)
         Me.FlowLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Fill
         Me.FlowLayoutPanel1.Location = New System.Drawing.Point(3, 3)
         Me.FlowLayoutPanel1.Name = "FlowLayoutPanel1"
@@ -166,6 +185,7 @@ Partial Class MFMain
         Me.btnSuelo.Name = "btnSuelo"
         Me.btnSuelo.Size = New System.Drawing.Size(58, 41)
         Me.btnSuelo.TabIndex = 1
+        Me.btnSuelo.Tag = "0"
         Me.btnSuelo.Text = "Libre"
         Me.btnSuelo.UseVisualStyleBackColor = False
         '
@@ -183,6 +203,7 @@ Partial Class MFMain
         Me.btnPared.Name = "btnPared"
         Me.btnPared.Size = New System.Drawing.Size(58, 41)
         Me.btnPared.TabIndex = 2
+        Me.btnPared.Tag = "1"
         Me.btnPared.Text = "Pared"
         Me.btnPared.UseVisualStyleBackColor = False
         '
@@ -214,16 +235,20 @@ Partial Class MFMain
         Me.pnlMapCreate.TabIndex = 2
         Me.pnlMapCreate.Visible = False
         '
-        'txtHeight
+        'Panel3
         '
-        Me.txtHeight.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
-        Me.txtHeight.Location = New System.Drawing.Point(82, 34)
-        Me.txtHeight.Maximum = New Decimal(New Integer() {150, 0, 0, 0})
-        Me.txtHeight.Minimum = New Decimal(New Integer() {10, 0, 0, 0})
-        Me.txtHeight.Name = "txtHeight"
-        Me.txtHeight.Size = New System.Drawing.Size(42, 22)
-        Me.txtHeight.TabIndex = 0
-        Me.txtHeight.Value = New Decimal(New Integer() {30, 0, 0, 0})
+        Me.Panel3.BackColor = System.Drawing.Color.WhiteSmoke
+        Me.Panel3.Controls.Add(Me.Label1)
+        Me.Panel3.Controls.Add(Me.btnMapCreate_OK)
+        Me.Panel3.Controls.Add(Me.txtHeight)
+        Me.Panel3.Controls.Add(Me.Label2)
+        Me.Panel3.Controls.Add(Me.txtWidth)
+        Me.Panel3.Dock = System.Windows.Forms.DockStyle.Fill
+        Me.Panel3.Location = New System.Drawing.Point(2, 2)
+        Me.Panel3.Name = "Panel3"
+        Me.Panel3.Padding = New System.Windows.Forms.Padding(10)
+        Me.Panel3.Size = New System.Drawing.Size(17, 18)
+        Me.Panel3.TabIndex = 5
         '
         'Label1
         '
@@ -235,6 +260,34 @@ Partial Class MFMain
         Me.Label1.Size = New System.Drawing.Size(31, 17)
         Me.Label1.TabIndex = 1
         Me.Label1.Text = "Alto"
+        '
+        'btnMapCreate_OK
+        '
+        Me.btnMapCreate_OK.Dock = System.Windows.Forms.DockStyle.Bottom
+        Me.btnMapCreate_OK.FlatAppearance.BorderColor = System.Drawing.Color.DarkGray
+        Me.btnMapCreate_OK.FlatAppearance.MouseDownBackColor = System.Drawing.Color.CadetBlue
+        Me.btnMapCreate_OK.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(CType(CType(42, Byte), Integer), CType(CType(42, Byte), Integer), CType(CType(42, Byte), Integer))
+        Me.btnMapCreate_OK.FlatStyle = System.Windows.Forms.FlatStyle.Flat
+        Me.btnMapCreate_OK.Font = New System.Drawing.Font("Segoe UI", 9.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.btnMapCreate_OK.ForeColor = System.Drawing.Color.FromArgb(CType(CType(64, Byte), Integer), CType(CType(64, Byte), Integer), CType(CType(64, Byte), Integer))
+        Me.btnMapCreate_OK.Location = New System.Drawing.Point(10, -33)
+        Me.btnMapCreate_OK.Margin = New System.Windows.Forms.Padding(2, 3, 2, 3)
+        Me.btnMapCreate_OK.Name = "btnMapCreate_OK"
+        Me.btnMapCreate_OK.Size = New System.Drawing.Size(0, 41)
+        Me.btnMapCreate_OK.TabIndex = 4
+        Me.btnMapCreate_OK.Text = "Ok"
+        Me.btnMapCreate_OK.UseVisualStyleBackColor = True
+        '
+        'txtHeight
+        '
+        Me.txtHeight.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
+        Me.txtHeight.Location = New System.Drawing.Point(82, 34)
+        Me.txtHeight.Maximum = New Decimal(New Integer() {150, 0, 0, 0})
+        Me.txtHeight.Minimum = New Decimal(New Integer() {10, 0, 0, 0})
+        Me.txtHeight.Name = "txtHeight"
+        Me.txtHeight.Size = New System.Drawing.Size(42, 22)
+        Me.txtHeight.TabIndex = 0
+        Me.txtHeight.Value = New Decimal(New Integer() {30, 0, 0, 0})
         '
         'Label2
         '
@@ -258,38 +311,6 @@ Partial Class MFMain
         Me.txtWidth.TabIndex = 2
         Me.txtWidth.Value = New Decimal(New Integer() {30, 0, 0, 0})
         '
-        'btnMapCreate_OK
-        '
-        Me.btnMapCreate_OK.Dock = System.Windows.Forms.DockStyle.Bottom
-        Me.btnMapCreate_OK.FlatAppearance.BorderColor = System.Drawing.Color.DarkGray
-        Me.btnMapCreate_OK.FlatAppearance.MouseDownBackColor = System.Drawing.Color.CadetBlue
-        Me.btnMapCreate_OK.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(CType(CType(42, Byte), Integer), CType(CType(42, Byte), Integer), CType(CType(42, Byte), Integer))
-        Me.btnMapCreate_OK.FlatStyle = System.Windows.Forms.FlatStyle.Flat
-        Me.btnMapCreate_OK.Font = New System.Drawing.Font("Segoe UI", 9.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.btnMapCreate_OK.ForeColor = System.Drawing.Color.FromArgb(CType(CType(64, Byte), Integer), CType(CType(64, Byte), Integer), CType(CType(64, Byte), Integer))
-        Me.btnMapCreate_OK.Location = New System.Drawing.Point(10, -33)
-        Me.btnMapCreate_OK.Margin = New System.Windows.Forms.Padding(2, 3, 2, 3)
-        Me.btnMapCreate_OK.Name = "btnMapCreate_OK"
-        Me.btnMapCreate_OK.Size = New System.Drawing.Size(0, 41)
-        Me.btnMapCreate_OK.TabIndex = 4
-        Me.btnMapCreate_OK.Text = "Ok"
-        Me.btnMapCreate_OK.UseVisualStyleBackColor = True
-        '
-        'Panel3
-        '
-        Me.Panel3.BackColor = System.Drawing.Color.WhiteSmoke
-        Me.Panel3.Controls.Add(Me.Label1)
-        Me.Panel3.Controls.Add(Me.btnMapCreate_OK)
-        Me.Panel3.Controls.Add(Me.txtHeight)
-        Me.Panel3.Controls.Add(Me.Label2)
-        Me.Panel3.Controls.Add(Me.txtWidth)
-        Me.Panel3.Dock = System.Windows.Forms.DockStyle.Fill
-        Me.Panel3.Location = New System.Drawing.Point(2, 2)
-        Me.Panel3.Name = "Panel3"
-        Me.Panel3.Padding = New System.Windows.Forms.Padding(10)
-        Me.Panel3.Size = New System.Drawing.Size(17, 18)
-        Me.Panel3.TabIndex = 5
-        '
         'SplitContainer
         '
         Me.SplitContainer.Dock = System.Windows.Forms.DockStyle.Fill
@@ -309,22 +330,23 @@ Partial Class MFMain
         Me.SplitContainer.SplitterDistance = 79
         Me.SplitContainer.TabIndex = 3
         '
-        'btnSave
+        'btnAgente
         '
-        Me.btnSave.Dock = System.Windows.Forms.DockStyle.Top
-        Me.btnSave.FlatAppearance.BorderSize = 0
-        Me.btnSave.FlatAppearance.MouseDownBackColor = System.Drawing.Color.CadetBlue
-        Me.btnSave.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(CType(CType(42, Byte), Integer), CType(CType(42, Byte), Integer), CType(CType(42, Byte), Integer))
-        Me.btnSave.FlatStyle = System.Windows.Forms.FlatStyle.Flat
-        Me.btnSave.Font = New System.Drawing.Font("Segoe UI", 9.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.btnSave.ForeColor = System.Drawing.Color.Gainsboro
-        Me.btnSave.Location = New System.Drawing.Point(5, 46)
-        Me.btnSave.Margin = New System.Windows.Forms.Padding(2, 3, 2, 3)
-        Me.btnSave.Name = "btnSave"
-        Me.btnSave.Size = New System.Drawing.Size(69, 41)
-        Me.btnSave.TabIndex = 2
-        Me.btnSave.Text = "Guardar"
-        Me.btnSave.UseVisualStyleBackColor = True
+        Me.btnAgente.BackColor = System.Drawing.Color.Silver
+        Me.btnAgente.FlatAppearance.BorderSize = 0
+        Me.btnAgente.FlatAppearance.MouseDownBackColor = System.Drawing.Color.CadetBlue
+        Me.btnAgente.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(CType(CType(42, Byte), Integer), CType(CType(42, Byte), Integer), CType(CType(42, Byte), Integer))
+        Me.btnAgente.FlatStyle = System.Windows.Forms.FlatStyle.Flat
+        Me.btnAgente.Font = New System.Drawing.Font("Segoe UI", 9.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.btnAgente.ForeColor = System.Drawing.Color.DimGray
+        Me.btnAgente.Location = New System.Drawing.Point(2, 97)
+        Me.btnAgente.Margin = New System.Windows.Forms.Padding(2, 3, 2, 3)
+        Me.btnAgente.Name = "btnAgente"
+        Me.btnAgente.Size = New System.Drawing.Size(58, 41)
+        Me.btnAgente.TabIndex = 3
+        Me.btnAgente.Tag = "-1"
+        Me.btnAgente.Text = "Agente"
+        Me.btnAgente.UseVisualStyleBackColor = False
         '
         'MFMain
         '
@@ -345,10 +367,10 @@ Partial Class MFMain
         Me.Panel2.ResumeLayout(False)
         Me.FlowLayoutPanel1.ResumeLayout(False)
         Me.pnlMapCreate.ResumeLayout(False)
-        CType(Me.txtHeight, System.ComponentModel.ISupportInitialize).EndInit()
-        CType(Me.txtWidth, System.ComponentModel.ISupportInitialize).EndInit()
         Me.Panel3.ResumeLayout(False)
         Me.Panel3.PerformLayout()
+        CType(Me.txtHeight, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.txtWidth, System.ComponentModel.ISupportInitialize).EndInit()
         Me.SplitContainer.Panel1.ResumeLayout(False)
         Me.SplitContainer.Panel2.ResumeLayout(False)
         CType(Me.SplitContainer, System.ComponentModel.ISupportInitialize).EndInit()
@@ -372,5 +394,6 @@ Partial Class MFMain
     Friend WithEvents Panel3 As System.Windows.Forms.Panel
     Friend WithEvents SplitContainer As System.Windows.Forms.SplitContainer
     Friend WithEvents btnSave As System.Windows.Forms.Button
+    Friend WithEvents btnAgente As System.Windows.Forms.Button
 
 End Class
