@@ -807,6 +807,37 @@ var CAgent = function (Params, Tasks, Name, speed, Position, ActiveCollisions) {
 
         function Decision() {
 
+            function Remove(){
+
+                function RemoveCube(z, x){
+                    var id = Number('10' + Number(z) + '10' + Number(x));
+                    var selectedObject = Params.scene.getObjectById(id);
+                    Params.scene.remove(selectedObject);
+
+                    Params.MAPMatrix[z][x] = _BLOCKFREE;
+
+                    UpdateSensors();
+                }
+
+                if ((_sensors._up >= 0 && _sensors._up < Params.typesblocks.length) && Params.blocks[_sensors._up]._type == 'removable') {
+                    RemoveCube(currentpos.z - 1, currentpos.x);
+                }
+
+                if ((_sensors._down >= 0 && _sensors._down < Params.typesblocks.length) && Params.blocks[_sensors._down]._type == 'removable') {
+                    RemoveCube(currentpos.z + 1, currentpos.x);
+                }
+
+                if ((_sensors._right >= 0 && _sensors._right < Params.typesblocks.length) && Params.blocks[_sensors._right]._type == 'removable') {
+                    RemoveCube(currentpos.z, currentpos.x + 1);
+                }
+
+                if ((_sensors._left >= 0 && _sensors._left < Params.typesblocks.length) && Params.blocks[_sensors._left]._type == 'removable') {
+                    RemoveCube(currentpos.z, currentpos.x - 1);
+                }                 
+                return;
+            }
+            
+
             function CreateTasks(mov) {
                 /*debe dejar tareas por hacer de los lugares que no visita,
                     sin contar por el que está apunto de abordar.
@@ -829,6 +860,9 @@ var CAgent = function (Params, Tasks, Name, speed, Position, ActiveCollisions) {
             }
             
             var currentpos = new position(_Visualobj.position.z, _Visualobj.position.x);
+
+            Remove();
+
             var Up = (_sensors._up == _BLOCKFREE ? 1 : 0);
             var Down = (_sensors._down == _BLOCKFREE ? 1 : 0);
             var Right = (_sensors._right == _BLOCKFREE ? 1 : 0);

@@ -81,7 +81,7 @@ var MapParams;
 
 var OceanScene = false, Antialiasing = false, Textures = false, Mapcalculation = false;
 
-var AgentSpeed = 0.05; //0.2
+var AgentSpeed = 0.1; //0.2
 
 //UI objects
     var btnfile_input;
