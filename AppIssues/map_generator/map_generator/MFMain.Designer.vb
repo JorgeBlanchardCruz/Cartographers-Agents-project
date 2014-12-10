@@ -33,6 +33,7 @@ Partial Class MFMain
         Me.FlowLayoutPanel1 = New System.Windows.Forms.FlowLayoutPanel()
         Me.btnSuelo = New System.Windows.Forms.Button()
         Me.btnPared = New System.Windows.Forms.Button()
+        Me.btnAgente = New System.Windows.Forms.Button()
         Me.btnMapCreate = New System.Windows.Forms.Button()
         Me.pnlMapCreate = New System.Windows.Forms.Panel()
         Me.Panel3 = New System.Windows.Forms.Panel()
@@ -42,7 +43,10 @@ Partial Class MFMain
         Me.Label2 = New System.Windows.Forms.Label()
         Me.txtWidth = New System.Windows.Forms.NumericUpDown()
         Me.SplitContainer = New System.Windows.Forms.SplitContainer()
-        Me.btnAgente = New System.Windows.Forms.Button()
+        Me.btnAgua = New System.Windows.Forms.Button()
+        Me.btnArbol = New System.Windows.Forms.Button()
+        Me.btnEscombros = New System.Windows.Forms.Button()
+        Me.btnLoad = New System.Windows.Forms.Button()
         CType(Me.grid, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.Panel1.SuspendLayout()
         Me.Panel2.SuspendLayout()
@@ -120,6 +124,7 @@ Partial Class MFMain
         'Panel1
         '
         Me.Panel1.BackColor = System.Drawing.Color.FromArgb(CType(CType(57, Byte), Integer), CType(CType(57, Byte), Integer), CType(CType(57, Byte), Integer))
+        Me.Panel1.Controls.Add(Me.btnLoad)
         Me.Panel1.Controls.Add(Me.btnSave)
         Me.Panel1.Controls.Add(Me.Panel2)
         Me.Panel1.Controls.Add(Me.btnMapCreate)
@@ -164,6 +169,9 @@ Partial Class MFMain
         Me.FlowLayoutPanel1.BackColor = System.Drawing.Color.FromArgb(CType(CType(57, Byte), Integer), CType(CType(57, Byte), Integer), CType(CType(57, Byte), Integer))
         Me.FlowLayoutPanel1.Controls.Add(Me.btnSuelo)
         Me.FlowLayoutPanel1.Controls.Add(Me.btnPared)
+        Me.FlowLayoutPanel1.Controls.Add(Me.btnEscombros)
+        Me.FlowLayoutPanel1.Controls.Add(Me.btnAgua)
+        Me.FlowLayoutPanel1.Controls.Add(Me.btnArbol)
         Me.FlowLayoutPanel1.Controls.Add(Me.btnAgente)
         Me.FlowLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Fill
         Me.FlowLayoutPanel1.Location = New System.Drawing.Point(3, 3)
@@ -206,6 +214,24 @@ Partial Class MFMain
         Me.btnPared.Tag = "1"
         Me.btnPared.Text = "Pared"
         Me.btnPared.UseVisualStyleBackColor = False
+        '
+        'btnAgente
+        '
+        Me.btnAgente.BackColor = System.Drawing.Color.Silver
+        Me.btnAgente.FlatAppearance.BorderSize = 0
+        Me.btnAgente.FlatAppearance.MouseDownBackColor = System.Drawing.Color.CadetBlue
+        Me.btnAgente.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(CType(CType(42, Byte), Integer), CType(CType(42, Byte), Integer), CType(CType(42, Byte), Integer))
+        Me.btnAgente.FlatStyle = System.Windows.Forms.FlatStyle.Flat
+        Me.btnAgente.Font = New System.Drawing.Font("Segoe UI", 9.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.btnAgente.ForeColor = System.Drawing.Color.DimGray
+        Me.btnAgente.Location = New System.Drawing.Point(2, 238)
+        Me.btnAgente.Margin = New System.Windows.Forms.Padding(2, 3, 2, 3)
+        Me.btnAgente.Name = "btnAgente"
+        Me.btnAgente.Size = New System.Drawing.Size(58, 41)
+        Me.btnAgente.TabIndex = 3
+        Me.btnAgente.Tag = "-1"
+        Me.btnAgente.Text = "Agente"
+        Me.btnAgente.UseVisualStyleBackColor = False
         '
         'btnMapCreate
         '
@@ -330,23 +356,76 @@ Partial Class MFMain
         Me.SplitContainer.SplitterDistance = 79
         Me.SplitContainer.TabIndex = 3
         '
-        'btnAgente
+        'btnAgua
         '
-        Me.btnAgente.BackColor = System.Drawing.Color.Silver
-        Me.btnAgente.FlatAppearance.BorderSize = 0
-        Me.btnAgente.FlatAppearance.MouseDownBackColor = System.Drawing.Color.CadetBlue
-        Me.btnAgente.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(CType(CType(42, Byte), Integer), CType(CType(42, Byte), Integer), CType(CType(42, Byte), Integer))
-        Me.btnAgente.FlatStyle = System.Windows.Forms.FlatStyle.Flat
-        Me.btnAgente.Font = New System.Drawing.Font("Segoe UI", 9.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.btnAgente.ForeColor = System.Drawing.Color.DimGray
-        Me.btnAgente.Location = New System.Drawing.Point(2, 97)
-        Me.btnAgente.Margin = New System.Windows.Forms.Padding(2, 3, 2, 3)
-        Me.btnAgente.Name = "btnAgente"
-        Me.btnAgente.Size = New System.Drawing.Size(58, 41)
-        Me.btnAgente.TabIndex = 3
-        Me.btnAgente.Tag = "-1"
-        Me.btnAgente.Text = "Agente"
-        Me.btnAgente.UseVisualStyleBackColor = False
+        Me.btnAgua.BackColor = System.Drawing.Color.FromArgb(CType(CType(61, Byte), Integer), CType(CType(133, Byte), Integer), CType(CType(179, Byte), Integer))
+        Me.btnAgua.FlatAppearance.BorderSize = 0
+        Me.btnAgua.FlatAppearance.MouseDownBackColor = System.Drawing.Color.CadetBlue
+        Me.btnAgua.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(CType(CType(42, Byte), Integer), CType(CType(42, Byte), Integer), CType(CType(42, Byte), Integer))
+        Me.btnAgua.FlatStyle = System.Windows.Forms.FlatStyle.Flat
+        Me.btnAgua.Font = New System.Drawing.Font("Segoe UI", 9.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.btnAgua.ForeColor = System.Drawing.Color.Gainsboro
+        Me.btnAgua.Location = New System.Drawing.Point(2, 144)
+        Me.btnAgua.Margin = New System.Windows.Forms.Padding(2, 3, 2, 3)
+        Me.btnAgua.Name = "btnAgua"
+        Me.btnAgua.Size = New System.Drawing.Size(58, 41)
+        Me.btnAgua.TabIndex = 4
+        Me.btnAgua.Tag = "3"
+        Me.btnAgua.Text = "Agua"
+        Me.btnAgua.UseVisualStyleBackColor = False
+        '
+        'btnArbol
+        '
+        Me.btnArbol.BackColor = System.Drawing.Color.FromArgb(CType(CType(98, Byte), Integer), CType(CType(130, Byte), Integer), CType(CType(51, Byte), Integer))
+        Me.btnArbol.FlatAppearance.BorderSize = 0
+        Me.btnArbol.FlatAppearance.MouseDownBackColor = System.Drawing.Color.CadetBlue
+        Me.btnArbol.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(CType(CType(42, Byte), Integer), CType(CType(42, Byte), Integer), CType(CType(42, Byte), Integer))
+        Me.btnArbol.FlatStyle = System.Windows.Forms.FlatStyle.Flat
+        Me.btnArbol.Font = New System.Drawing.Font("Segoe UI", 9.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.btnArbol.ForeColor = System.Drawing.Color.Gainsboro
+        Me.btnArbol.Location = New System.Drawing.Point(2, 191)
+        Me.btnArbol.Margin = New System.Windows.Forms.Padding(2, 3, 2, 3)
+        Me.btnArbol.Name = "btnArbol"
+        Me.btnArbol.Size = New System.Drawing.Size(58, 41)
+        Me.btnArbol.TabIndex = 5
+        Me.btnArbol.Tag = "4"
+        Me.btnArbol.Text = "Árbol"
+        Me.btnArbol.UseVisualStyleBackColor = False
+        '
+        'btnEscombros
+        '
+        Me.btnEscombros.BackColor = System.Drawing.Color.FromArgb(CType(CType(242, Byte), Integer), CType(CType(210, Byte), Integer), CType(CType(29, Byte), Integer))
+        Me.btnEscombros.FlatAppearance.BorderSize = 0
+        Me.btnEscombros.FlatAppearance.MouseDownBackColor = System.Drawing.Color.CadetBlue
+        Me.btnEscombros.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(CType(CType(42, Byte), Integer), CType(CType(42, Byte), Integer), CType(CType(42, Byte), Integer))
+        Me.btnEscombros.FlatStyle = System.Windows.Forms.FlatStyle.Flat
+        Me.btnEscombros.Font = New System.Drawing.Font("Segoe UI", 6.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.btnEscombros.ForeColor = System.Drawing.Color.DimGray
+        Me.btnEscombros.Location = New System.Drawing.Point(2, 97)
+        Me.btnEscombros.Margin = New System.Windows.Forms.Padding(2, 3, 2, 3)
+        Me.btnEscombros.Name = "btnEscombros"
+        Me.btnEscombros.Size = New System.Drawing.Size(58, 41)
+        Me.btnEscombros.TabIndex = 6
+        Me.btnEscombros.Tag = "2"
+        Me.btnEscombros.Text = "Escombros"
+        Me.btnEscombros.UseVisualStyleBackColor = False
+        '
+        'btnLoad
+        '
+        Me.btnLoad.Dock = System.Windows.Forms.DockStyle.Top
+        Me.btnLoad.FlatAppearance.BorderSize = 0
+        Me.btnLoad.FlatAppearance.MouseDownBackColor = System.Drawing.Color.CadetBlue
+        Me.btnLoad.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(CType(CType(42, Byte), Integer), CType(CType(42, Byte), Integer), CType(CType(42, Byte), Integer))
+        Me.btnLoad.FlatStyle = System.Windows.Forms.FlatStyle.Flat
+        Me.btnLoad.Font = New System.Drawing.Font("Segoe UI", 9.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.btnLoad.ForeColor = System.Drawing.Color.Gainsboro
+        Me.btnLoad.Location = New System.Drawing.Point(5, 87)
+        Me.btnLoad.Margin = New System.Windows.Forms.Padding(2, 3, 2, 3)
+        Me.btnLoad.Name = "btnLoad"
+        Me.btnLoad.Size = New System.Drawing.Size(69, 41)
+        Me.btnLoad.TabIndex = 3
+        Me.btnLoad.Text = "Cargar"
+        Me.btnLoad.UseVisualStyleBackColor = True
         '
         'MFMain
         '
@@ -395,5 +474,9 @@ Partial Class MFMain
     Friend WithEvents SplitContainer As System.Windows.Forms.SplitContainer
     Friend WithEvents btnSave As System.Windows.Forms.Button
     Friend WithEvents btnAgente As System.Windows.Forms.Button
+    Friend WithEvents btnAgua As System.Windows.Forms.Button
+    Friend WithEvents btnArbol As System.Windows.Forms.Button
+    Friend WithEvents btnEscombros As System.Windows.Forms.Button
+    Friend WithEvents btnLoad As System.Windows.Forms.Button
 
 End Class

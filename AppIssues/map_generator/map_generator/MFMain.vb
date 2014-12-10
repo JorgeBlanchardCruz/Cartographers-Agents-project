@@ -49,6 +49,12 @@ Public Class MFMain
         pi.SetValue(dgv, True, Nothing)
     End Sub
 
+    Private Sub CellPaint(ByVal row As Integer, ByVal col As Integer, ByVal color As Color, ByVal value As Integer)
+        Me.grid.Rows(row).Cells(col).Style.BackColor = color
+        Me.grid.Rows(row).Cells(col).Style.ForeColor = color
+        Me.grid.Rows(row).Cells(col).Value = value
+    End Sub
+
     Private Sub Save(ByVal PathFile As String)
         Cursor = System.Windows.Forms.Cursors.WaitCursor
         Try
@@ -60,10 +66,10 @@ Public Class MFMain
                 For column As Integer = 0 To Me.grid.ColumnCount - 1
 
                     Select Case Me.grid.Item(column, row).Value
-                        Case 1
-                            Blocks += row.ToString & "," & column.ToString & ";" & "1" & Chr(13)
                         Case -1
                             Agents += row.ToString & "," & column.ToString & Chr(13)
+                        Case 1 To 4
+                            Blocks += row.ToString & "," & column.ToString & ";" & Me.grid.Item(column, row).Value.ToString & Chr(13)
                     End Select
 
                 Next column
@@ -81,12 +87,9 @@ Public Class MFMain
         End Try
     End Sub
 
-    Private Sub CellPaint(ByVal row As Integer, ByVal col As Integer, ByVal color As Color, ByVal value As Integer)
-        Me.grid.Rows(row).Cells(col).Style.BackColor = color
-        Me.grid.Rows(row).Cells(col).Style.ForeColor = color
-        Me.grid.Rows(row).Cells(col).Value = value
-    End Sub
+    Private Sub Load(ByVal PathFile As String)
 
+    End Sub
 
 #End Region
 
@@ -112,7 +115,7 @@ Public Class MFMain
         MapCreate(Me.txtHeight.Value, Me.txtWidth.Value)
     End Sub
 
-    Private Sub btnBlock_Click(sender As Object, e As EventArgs) Handles btnSuelo.Click, btnPared.Click, btnAgente.Click
+    Private Sub btnBlock_Click(sender As Object, e As EventArgs) Handles btnSuelo.Click, btnPared.Click, btnAgente.Click, btnEscombros.Click, btnArbol.Click, btnAgua.Click
         SelectedColor = CType(sender, Button).BackColor
         SelectedValue = CType(sender, Button).Tag
         Me.grid.DefaultCellStyle.SelectionBackColor = SelectedColor
@@ -124,12 +127,24 @@ Public Class MFMain
             Exit Sub
         End If
 
-        Dim saveFileDialog1 As New SaveFileDialog()
-        saveFileDialog1.Filter = "Map file|*.map"
-        saveFileDialog1.Title = "Guardar fichero de mapa"
-        saveFileDialog1.ShowDialog()
-        If saveFileDialog1.FileName <> String.Empty Then
-            Save(saveFileDialog1.FileName)
+        Dim saveFileDialog As New SaveFileDialog()
+        saveFileDialog.Filter = "Map file|*.map"
+        saveFileDialog.Title = "Guardar fichero de mapa"
+        saveFileDialog.ShowDialog()
+        If saveFileDialog.FileName <> String.Empty Then
+            Save(saveFileDialog.FileName)
+
+            MessageBox.Show("Mapa guardado.")
+        End If
+    End Sub
+
+    Private Sub btnLoad_Click(sender As Object, e As EventArgs) Handles btnLoad.Click
+        Dim openFileDialog As New OpenFileDialog
+        openFileDialog.Filter = "Map file|*.map"
+        openFileDialog.Title = "Cargar fichero de mapa"
+        openFileDialog.ShowDialog()
+        If openFileDialog.FileName <> String.Empty Then
+            Load(openFileDialog.FileName)
         End If
     End Sub
 
@@ -160,16 +175,6 @@ Public Class MFMain
             CellPaint(e.RowIndex, e.ColumnIndex, SelectedColor, SelectedValue)
         End If
     End Sub
-
-    'Private Sub grid_CellMouseLeave(sender As Object, e As DataGridViewCellEventArgs) Handles grid.CellMouseLeave
-    '    If (Not Painting) Then
-    '        Exit Sub
-    '    End If
-
-    '    If (e.RowIndex > -1) And (e.ColumnIndex > -1) Then
-    '        CellPaint(e.RowIndex, e.ColumnIndex, SelectedColor, SelectedValue)
-    '    End If
-    'End Sub
 
     Private Sub grid_CellMouseUp(sender As Object, e As DataGridViewCellMouseEventArgs) Handles grid.CellMouseUp
         Painting = False
