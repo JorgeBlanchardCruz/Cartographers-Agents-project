@@ -21,7 +21,6 @@ var C3DWorld = function (Antialias, OceanScene) {
     const _SEP_COORD = ',';
     const _SET_TYPE = ';';
     const _COLOR_BACKGROUNDSCENE = '#BDE6F2';
-    const _LIMAP_CONTENT = 4;
     const _BLOCKFREE = -1;
 
         //Objetos para la escena
@@ -32,14 +31,12 @@ var C3DWorld = function (Antialias, OceanScene) {
 
         //atributos del mapa
         var _MAPMatrix;
-        var _MapWidth = 0, _MapHeight = 0;
-        var _Path;
-        var _NodeSTART;
-        var _NodeOBJETIVE;
+        var _MapWidth = 0, _MapHeight = 0;     
         //---------------------
 
     var _TypeBlock;
     var _Blocks;
+    var _PosAgents = new Array();
  
     
     //INITIALIZE
@@ -382,65 +379,6 @@ var C3DWorld = function (Antialias, OceanScene) {
         return undefined;
     }
 
-    function Read_FileMap_Way(content, Textures) {
-        ////Creamos los bloques ocupando todo el mapa y tambien la matriz del mapa
-        //_MAPMatrix = new Array();
-        //for (var z = 0; z < _MapHeight ; z++) {
-        //    var row = new Array()
-        //    for (var x = 0; x < _MapWidth; x++)
-        //        row.push(1);
-
-        //    _MAPMatrix.push(row);
-        //}
-
-        ////leemos linea a linea del fichero de texto y eliminamos los bloques encontrados
-        //for (var i = _LIMAP_CONTENT; i < content.length; i++) {
-        //    var line = content[i];
-        //    var z = Number(line.substring(0, line.lastIndexOf(_SEP_COORD)));
-        //    var x = Number(line.substring(line.lastIndexOf(_SEP_COORD) + 1, line.lastIndexOf(_SET_TYPE)));
-        //    var type = Number(line.substring(line.lastIndexOf(_SET_TYPE) + 1, line.length));
-
-        //    var id = Number('10' + Number(z) + '10' + Number(x));
-        //    var selectedObject = _scene.getObjectById(id);
-        //    _scene.remove(selectedObject);
-        //    if (type != -1) Create_cubeBlock(_Blocks[type], 1, 1, x, 0, z, Textures);
-
-        //    //modifica el elemento del array de mapa correspondiente
-        //    _MAPMatrix[z][x] = type;
-        //}
-    }
-
-    function Read_FileMap_Blocks(content, Textures) {
-        //Creamos  la matriz del mapa
-        _MAPMatrix = new Array();
-        for (var z = 0; z < _MapHeight; z++) {
-            var row = new Array()
-            for (var x = 0; x < _MapWidth; x++)
-                row.push(_BLOCKFREE);
-
-            _MAPMatrix.push(row);
-        }
-
-        //leemos linea a linea del fichero de texto e insertamos los bloques encontrados
-        for (var i = _LIMAP_CONTENT; i < content.length; i++) {
-            var line = content[i];
-            var z = Number(line.substring(0, line.lastIndexOf(_SEP_COORD)));
-            var x = Number(line.substring(line.lastIndexOf(_SEP_COORD) + 1, line.lastIndexOf(_SET_TYPE)));
-            var type = Number(line.substring(line.lastIndexOf(_SET_TYPE) + 1, line.length));
-
-            var y = (_Blocks[type]._height < 1 ? -0.25 - _Blocks[type]._height : 0);
-
-            //si el bloque es de tipo 1, tenemos el nodo objetivo
-            if (type == 2)
-                _NodeOBJETIVE = new position(z, x);
-
-            Create_cubeBlock(_Blocks[type], 1, 1, x, y, z, Textures);
-
-            //modifica el elemento del array de mapa correspondiente
-            _MAPMatrix[z][x] = type;
-        }
-    }
-
     function Clear_Cave() {
         for (var i = 0; i < _scene.children.length; i++) {
             var object = _scene.children[i];
@@ -468,10 +406,8 @@ var C3DWorld = function (Antialias, OceanScene) {
             height: _MapHeight,
             typesblocks: _TypeBlock,
             blocks: _Blocks,
-            path: _Path,
             MAPMatrix: _MAPMatrix,
-            NodeSTART: _NodeSTART,
-            NodeOBJETIVE: _NodeOBJETIVE
+            PosAgents: _PosAgents
         };
     }
         //-------------------------------------------------------
@@ -484,28 +420,77 @@ var C3DWorld = function (Antialias, OceanScene) {
 
         var reader = new FileReader();
         reader.onload = function (progressEvent) {
-            //separa el contenido del fichero por \n
-            var content = this.result.split('\n');
 
-            //recogemos las dimensiones del mapa
-            var height = content[0].substring(0, content[1].lastIndexOf('x'));
-            var width = content[0].substring(content[1].lastIndexOf('x') + 1, content[1].length);
-    
-            width = Number(width); _MapWidth = width;
-            height = Number(height); _MapHeight = height;
+            function Dimensions() {
+                //recogemos las dimensiones del mapa
+                var height = Line.substring(0, Line.lastIndexOf('x'));
+                var width = Line.substring(Line.lastIndexOf('x') + 1, Line.length);
 
-            //crea una plataforma (cubo) donde sustentar el mapa
-            width = Number(width) + 1; height = Number(height) + 1;
-            Create_cubeBlock(_Blocks[0], width, height, (width / 2) - 1, -0.5, (height / 2) - 1, Textures);
+                width = Number(width); _MapWidth = width;
+                height = Number(height); _MapHeight = height;
 
-            //recoge la posición del agente (z,x)
-            _NodeSTART = new position(Number(content[2].substring(0, content[2].lastIndexOf(_SEP_COORD))), Number(content[2].substring(content[2].lastIndexOf(_SEP_COORD) + 1, content.length - 1)));
-            //_NodeOBJETIVE = new position(1, 0);
+                //Creamos  la matriz del mapa
+                _MAPMatrix = new Array();
+                for (var z = 0; z < _MapHeight; z++) {
+                    var row = new Array()
+                    for (var x = 0; x < _MapWidth; x++)
+                        row.push(_BLOCKFREE);
 
-            //recoge la trayectoria del agente
-            _Path = content[3];
-         
-            Read_FileMap_Blocks(content, Textures);
+                    _MAPMatrix.push(row);
+                }
+
+                //crea una plataforma (cubo) donde sustentar el mapa
+                width = Number(width) + 1; height = Number(height) + 1;
+                Create_cubeBlock(_Blocks[0], width, height, (width / 2) - 1, -0.5, (height / 2) - 1, Textures);
+            }
+
+            function Agents() {
+                if (Line == "Agents")
+                    return;
+
+                var z = Number(line.substring(0, line.lastIndexOf(_SEP_COORD)));
+                var x = Number(line.substring(line.lastIndexOf(_SEP_COORD) + 1, Line.length));
+
+                _PosAgents.push(new position(z, x));
+            }
+
+            function Blocks() {
+                if (Line == "Blocks")
+                    return;
+
+                var z = Number(line.substring(0, line.lastIndexOf(_SEP_COORD)));
+                var x = Number(line.substring(line.lastIndexOf(_SEP_COORD) + 1, line.lastIndexOf(_SET_TYPE)));
+                var type = Number(line.substring(line.lastIndexOf(_SET_TYPE) + 1, line.length));
+
+                var y = (_Blocks[type]._height < 1 ? -0.25 - _Blocks[type]._height : 0);
+
+                Create_cubeBlock(_Blocks[type], 1, 1, x, y, z, Textures);
+
+                //modifica el elemento del array de mapa correspondiente
+                _MAPMatrix[z][x] = type;
+            }
+
+            var Entity = "Dimension";
+            
+            var content = this.result.split('\n'); //separa el contenido del fichero por \n
+            for (var i = 0; i < content.length; i++) {
+
+                var Line = content[i];
+
+                Entity = (Line == "Agents" || Line == "Blocks" ? Line : Entity);
+
+                switch (Entity) {
+                    case "Dimension":
+                        Dimensions();
+                        break;
+                    case "Agents":
+                        Agents();
+                        break;
+                    case "Blocks":
+                        Blocks();
+                        break;
+                }
+            }
 
             callback(); //ejecuta las funciones posteriores a cuando termina la carga del mapa
         };
