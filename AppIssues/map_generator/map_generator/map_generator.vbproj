@@ -46,7 +46,7 @@
     <OptionInfer>On</OptionInfer>
   </PropertyGroup>
   <PropertyGroup>
-    <ApplicationIcon>cube.ico</ApplicationIcon>
+    <ApplicationIcon>1418257722_83267.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -102,9 +102,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="My Project\Resources.resx">
       <Generator>VbMyResourcesResXFileCodeGenerator</Generator>
-      <LastGenOutput>Resources.Designer.vb</LastGenOutput>
       <CustomToolNamespace>My.Resources</CustomToolNamespace>
       <SubType>Designer</SubType>
+      <LastGenOutput>Resources.Designer.vb</LastGenOutput>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
@@ -120,8 +120,10 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="- Assets\cube.ico" />
-    <Content Include="- Assets\cube.PNG" />
+    <None Include="- Assets\1418257949_cube.png" />
+    <None Include="- Assets\save_as.png" />
+    <None Include="- Assets\folder_open.png" />
+    <Content Include="1418257722_83267.ico" />
     <Content Include="cube.ico" />
   </ItemGroup>
   <ItemGroup>
