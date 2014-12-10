@@ -7,7 +7,7 @@
 "use strict";
 
 //la dimensión 'y' ha sido bloqueada
-var CAgent = function (Params, Tasks, speed, Position, ActiveCollisions) {
+var CAgent = function (Params, Tasks, Name, speed, Position, ActiveCollisions) {
 
     //STRUCTURES
     function path(name, path) {
@@ -69,7 +69,9 @@ var CAgent = function (Params, Tasks, speed, Position, ActiveCollisions) {
     const _BLOCKVISITED = 'v';
     const _BLOCKFREE = -1;
     const _BLOCKEXIT = 'e';
+    const _MAXIMUNCHECKS = 10;
 
+    var _Name = Name;
     var _Startpos = new position(Position.z, Position.x);
     var _Visualobj;  //objeto visual en el mundo 3d 
 
@@ -80,7 +82,7 @@ var CAgent = function (Params, Tasks, speed, Position, ActiveCollisions) {
     //movement
     var _currentblock = _Startpos;
     var _distanceNewblock = 0;
-    var _speed = speed;
+    var _speed = Number(speed.toFixed(2));
     var _movement = 'stop';
     var _function = 'nothing';
     var _sensors = new sensor();
@@ -204,7 +206,7 @@ var CAgent = function (Params, Tasks, speed, Position, ActiveCollisions) {
             Reactor();
         }
 
-        obj_position.innerHTML = '<small> agent (z,x): ' + _Visualobj.position.z.toFixed(2).toString() + ' ; ' + _Visualobj.position.x.toFixed(2).toString() + '</small>';
+        //obj_position.innerHTML = '<small> agent (z,x): ' + _Visualobj.position.z.toFixed(2).toString() + ' ; ' + _Visualobj.position.x.toFixed(2).toString() + '</small>';
     }
 
     function Swing() {
@@ -810,19 +812,19 @@ var CAgent = function (Params, Tasks, speed, Position, ActiveCollisions) {
                     sin contar por el que está apunto de abordar.
                 */
                 if (Up && mov != 'Up') {
-                    Tasks.push(new task(new position(currentpos.z - 1, currentpos.x), 0));
+                    Tasks.push(new task(new position(currentpos.z - 1, currentpos.x), _Name));
                 }
 
                 if (Down && mov != 'Down') {
-                    Tasks.push(new task(new position(currentpos.z + 1, currentpos.x), 0));
+                    Tasks.push(new task(new position(currentpos.z + 1, currentpos.x), _Name));
                 }
 
                 if (Right && mov != 'Right') {
-                    Tasks.push(new task(new position(currentpos.z, currentpos.x + 1), 90));
+                    Tasks.push(new task(new position(currentpos.z, currentpos.x + 1), _Name));
                 }
 
                 if (Left && mov != 'Left') {
-                    Tasks.push(new task(new position(currentpos.z, currentpos.x - 1), 270));
+                    Tasks.push(new task(new position(currentpos.z, currentpos.x - 1), _Name));
                 }
             }
             
@@ -931,7 +933,10 @@ var CAgent = function (Params, Tasks, speed, Position, ActiveCollisions) {
             var Objetive;
             var iTask = -1; //se utiliza para obtener la tarea a realizar y en la nueva iteración, que no la tenga encuenta
             var chosen = false;
-            while (!chosen && Tasks.length > 0) {   
+            var ichecks = 0;
+            while (!chosen && Tasks.length > 0 && ichecks <= _MAXIMUNCHECKS) {
+
+                ichecks++;
 
                 if (Tasks.length > 0) { //si hay tareas pendientes
                     do { //recoge la posición más cercana que sea diferente de su posición actual
@@ -968,17 +973,21 @@ var CAgent = function (Params, Tasks, speed, Position, ActiveCollisions) {
                     chosen = false;
                 }
             }
-
-            
-            if (!chosen && Tasks.length <= 0) {
+      
+            if ((!chosen && Tasks.length <= 0) || ichecks >= _MAXIMUNCHECKS) {
                 Objetive = _Startpos;
                 var stringpath = Searchstrategy_ASTAR(Start, Objetive, false);
 
                 ExecPath(stringpath);
 
-                /*si ya se encuentra en su punto de partida y ha terminado todas las tareas
+                if (ichecks >= _MAXIMUNCHECKS)
+                    /*El agente ha hecho comprobaciones suficientes de camino 
+                    como para identificar que no tiene nada más que hacer*/
+                    _function = "finish";
+                else
+                    /*si ya se encuentra en su punto de partida y ha terminado todas las tareas
                     entra en estado de espera de tareas*/
-                _function = "wait";
+                    _function = "wait";
             }
 
             return;

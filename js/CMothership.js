@@ -23,7 +23,8 @@ var CMothership = function (Params, AgentSpeed) {
         _Agents = new Array()
 
         for (var i = 0; i < Params.PosAgents.length; i++) {
-            _Agents.push(new CAgent(Params, _Tasks, AgentSpeed, Params.PosAgents[i], true));
+            _Agents.push(new CAgent(Params, _Tasks, i, AgentSpeed, Params.PosAgents[i], true));
+            AgentSpeed += 0.02;
         }
     }
 

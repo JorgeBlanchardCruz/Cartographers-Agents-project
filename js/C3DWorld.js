@@ -87,7 +87,7 @@ var C3DWorld = function (Antialias, OceanScene) {
             new Block('pared', _TypeBlock[0], 'meshes/rock.jpg', '#6B5A37', 1),
             new Block('escombros', _TypeBlock[1], 'meshes/plywood.jpg', '#F2D21D', 1),
             new Block('agua', _TypeBlock[0], 'meshes/water.jpg', '#3D85B3', 0.1),
-            new Block('árbol', _TypeBlock[0], '', '#628233', 0.1),
+            new Block('árbol', _TypeBlock[0], '', '#628233', 1.2),
         ];
     }
 
@@ -448,8 +448,8 @@ var C3DWorld = function (Antialias, OceanScene) {
                 if (Line == "Agents")
                     return;
 
-                var z = Number(line.substring(0, line.lastIndexOf(_SEP_COORD)));
-                var x = Number(line.substring(line.lastIndexOf(_SEP_COORD) + 1, Line.length));
+                var z = Number(Line.substring(0, Line.lastIndexOf(_SEP_COORD)));
+                var x = Number(Line.substring(Line.lastIndexOf(_SEP_COORD) + 1, Line.length));
 
                 _PosAgents.push(new position(z, x));
             }
@@ -458,9 +458,12 @@ var C3DWorld = function (Antialias, OceanScene) {
                 if (Line == "Blocks")
                     return;
 
-                var z = Number(line.substring(0, line.lastIndexOf(_SEP_COORD)));
-                var x = Number(line.substring(line.lastIndexOf(_SEP_COORD) + 1, line.lastIndexOf(_SET_TYPE)));
-                var type = Number(line.substring(line.lastIndexOf(_SET_TYPE) + 1, line.length));
+                if (Line == "\n")
+                    return;
+
+                var z = Number(Line.substring(0, Line.lastIndexOf(_SEP_COORD)));
+                var x = Number(Line.substring(Line.lastIndexOf(_SEP_COORD) + 1, Line.lastIndexOf(_SET_TYPE)));
+                var type = Number(Line.substring(Line.lastIndexOf(_SET_TYPE) + 1, Line.length));
 
                 var y = (_Blocks[type]._height < 1 ? -0.25 - _Blocks[type]._height : 0);
 
@@ -472,7 +475,7 @@ var C3DWorld = function (Antialias, OceanScene) {
 
             var Entity = "Dimension";
             
-            var content = this.result.split('\n'); //separa el contenido del fichero por \n
+            var content = this.result.split('\r'); //separa el contenido del fichero por \n
             for (var i = 0; i < content.length; i++) {
 
                 var Line = content[i];

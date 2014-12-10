@@ -136,7 +136,7 @@ Partial Class MFMain
         Me.Panel1.Margin = New System.Windows.Forms.Padding(2, 3, 2, 3)
         Me.Panel1.Name = "Panel1"
         Me.Panel1.Padding = New System.Windows.Forms.Padding(5)
-        Me.Panel1.Size = New System.Drawing.Size(79, 952)
+        Me.Panel1.Size = New System.Drawing.Size(80, 952)
         Me.Panel1.TabIndex = 1
         '
         'btnLoad
@@ -151,7 +151,7 @@ Partial Class MFMain
         Me.btnLoad.Location = New System.Drawing.Point(5, 87)
         Me.btnLoad.Margin = New System.Windows.Forms.Padding(2, 3, 2, 3)
         Me.btnLoad.Name = "btnLoad"
-        Me.btnLoad.Size = New System.Drawing.Size(69, 41)
+        Me.btnLoad.Size = New System.Drawing.Size(70, 41)
         Me.btnLoad.TabIndex = 3
         Me.btnLoad.Text = "Cargar"
         Me.btnLoad.UseVisualStyleBackColor = True
@@ -168,7 +168,7 @@ Partial Class MFMain
         Me.btnSave.Location = New System.Drawing.Point(5, 46)
         Me.btnSave.Margin = New System.Windows.Forms.Padding(2, 3, 2, 3)
         Me.btnSave.Name = "btnSave"
-        Me.btnSave.Size = New System.Drawing.Size(69, 41)
+        Me.btnSave.Size = New System.Drawing.Size(70, 41)
         Me.btnSave.TabIndex = 2
         Me.btnSave.Text = "Guardar"
         Me.btnSave.UseVisualStyleBackColor = True
@@ -181,7 +181,7 @@ Partial Class MFMain
         Me.Panel2.Location = New System.Drawing.Point(5, 501)
         Me.Panel2.Name = "Panel2"
         Me.Panel2.Padding = New System.Windows.Forms.Padding(3)
-        Me.Panel2.Size = New System.Drawing.Size(69, 446)
+        Me.Panel2.Size = New System.Drawing.Size(70, 446)
         Me.Panel2.TabIndex = 1
         '
         'FlowLayoutPanel1
@@ -199,7 +199,7 @@ Partial Class MFMain
         Me.FlowLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Fill
         Me.FlowLayoutPanel1.Location = New System.Drawing.Point(3, 3)
         Me.FlowLayoutPanel1.Name = "FlowLayoutPanel1"
-        Me.FlowLayoutPanel1.Size = New System.Drawing.Size(63, 440)
+        Me.FlowLayoutPanel1.Size = New System.Drawing.Size(64, 440)
         Me.FlowLayoutPanel1.TabIndex = 0
         '
         'btnSuelo
@@ -362,7 +362,7 @@ Partial Class MFMain
         Me.btnMapCreate.Location = New System.Drawing.Point(5, 5)
         Me.btnMapCreate.Margin = New System.Windows.Forms.Padding(2, 3, 2, 3)
         Me.btnMapCreate.Name = "btnMapCreate"
-        Me.btnMapCreate.Size = New System.Drawing.Size(69, 41)
+        Me.btnMapCreate.Size = New System.Drawing.Size(70, 41)
         Me.btnMapCreate.TabIndex = 0
         Me.btnMapCreate.Text = "Crear"
         Me.btnMapCreate.UseVisualStyleBackColor = True
@@ -469,8 +469,8 @@ Partial Class MFMain
         '
         Me.SplitContainer.Panel2.Controls.Add(Me.pnlMapCreate)
         Me.SplitContainer.Panel2.Controls.Add(Me.grid)
-        Me.SplitContainer.Size = New System.Drawing.Size(981, 952)
-        Me.SplitContainer.SplitterDistance = 79
+        Me.SplitContainer.Size = New System.Drawing.Size(994, 952)
+        Me.SplitContainer.SplitterDistance = 80
         Me.SplitContainer.TabIndex = 3
         '
         'MFMain
@@ -478,7 +478,7 @@ Partial Class MFMain
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.BackColor = System.Drawing.Color.WhiteSmoke
-        Me.ClientSize = New System.Drawing.Size(981, 952)
+        Me.ClientSize = New System.Drawing.Size(994, 952)
         Me.Controls.Add(Me.SplitContainer)
         Me.DoubleBuffered = True
         Me.Font = New System.Drawing.Font("Segoe UI", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
