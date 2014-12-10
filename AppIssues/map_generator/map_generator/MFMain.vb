@@ -61,9 +61,14 @@ Public Class MFMain
     End Sub
 
     Private Sub btnMapCreate_Click(sender As Object, e As EventArgs) Handles btnMapCreate.Click
+        Me.pnlMapCreate.Size = New Size(147, 176)
+        Me.pnlMapCreate.BringToFront()
+        Me.pnlMapCreate.Visible = Not Me.pnlMapCreate.Visible
+    End Sub
 
-        MapCreate()
-
+    Private Sub btnMapCreate_OK_Click(sender As Object, e As EventArgs) Handles btnMapCreate_OK.Click
+        Me.pnlMapCreate.Visible = False
+        MapCreate(Me.txtHeight.Value, Me.txtWidth.Value)
     End Sub
 
     Private Sub btnBlock_Click(sender As Object, e As EventArgs) Handles btnSuelo.Click, btnPared.Click
@@ -71,16 +76,42 @@ Public Class MFMain
         Me.grid.DefaultCellStyle.SelectionBackColor = SelectedColor
     End Sub
 
-    Private Sub grid_CellMouseDown(sender As Object, e As DataGridViewCellMouseEventArgs) Handles grid.CellMouseDown
-        Painting = True
+    Private Sub btnSave_Click(sender As Object, e As EventArgs) Handles btnSave.Click
+        Dim saveFileDialog1 As New SaveFileDialog()
+        saveFileDialog1.Filter = "Map file|*.map"
+        saveFileDialog1.Title = "Guardar fichero de mapa"
+        saveFileDialog1.ShowDialog()
+        If saveFileDialog1.FileName <> String.Empty Then
 
-        If (e.RowIndex > -1) And (e.ColumnIndex > -1) Then
-            Me.grid.Rows(e.RowIndex).Cells(e.ColumnIndex).Style.BackColor = SelectedColor
+        End If
+    End Sub
+
+#Region "   Paint"
+
+    Private Sub grid_CellMouseDown(sender As Object, e As DataGridViewCellMouseEventArgs) Handles grid.CellMouseDown
+        If e.Button = Windows.Forms.MouseButtons.Left Then
+            Painting = True
+
+            If (e.RowIndex > -1) And (e.ColumnIndex > -1) Then
+                Me.grid.Rows(e.RowIndex).Cells(e.ColumnIndex).Style.BackColor = SelectedColor
+            End If
+        End If
+
+        If e.Button = Windows.Forms.MouseButtons.Right Then
+            If (e.RowIndex > -1) And (e.ColumnIndex > -1) Then
+                Me.grid.Rows(e.RowIndex).Cells(e.ColumnIndex).Style.BackColor = Me.btnSuelo.BackColor
+            End If
         End If
     End Sub
 
     Private Sub grid_CellMouseEnter(sender As Object, e As DataGridViewCellEventArgs) Handles grid.CellMouseEnter
+        If (Not Painting) Then
+            Exit Sub
+        End If
 
+        If (e.RowIndex > -1) And (e.ColumnIndex > -1) Then
+            Me.grid.Rows(e.RowIndex).Cells(e.ColumnIndex).Style.BackColor = SelectedColor
+        End If
     End Sub
 
     Private Sub grid_CellMouseLeave(sender As Object, e As DataGridViewCellEventArgs) Handles grid.CellMouseLeave
@@ -97,8 +128,10 @@ Public Class MFMain
         Painting = False
     End Sub
 
+#End Region
 
 #End Region
+
 
 
 
