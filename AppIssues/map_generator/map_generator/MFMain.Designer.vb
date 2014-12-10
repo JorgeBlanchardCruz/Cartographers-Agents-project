@@ -47,6 +47,9 @@ Partial Class MFMain
         Me.btnArbol = New System.Windows.Forms.Button()
         Me.btnEscombros = New System.Windows.Forms.Button()
         Me.btnLoad = New System.Windows.Forms.Button()
+        Me.Panel4 = New System.Windows.Forms.Panel()
+        Me.btnBordes = New System.Windows.Forms.Button()
+        Me.btnRellenar = New System.Windows.Forms.Button()
         CType(Me.grid, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.Panel1.SuspendLayout()
         Me.Panel2.SuspendLayout()
@@ -173,6 +176,9 @@ Partial Class MFMain
         Me.FlowLayoutPanel1.Controls.Add(Me.btnAgua)
         Me.FlowLayoutPanel1.Controls.Add(Me.btnArbol)
         Me.FlowLayoutPanel1.Controls.Add(Me.btnAgente)
+        Me.FlowLayoutPanel1.Controls.Add(Me.Panel4)
+        Me.FlowLayoutPanel1.Controls.Add(Me.btnBordes)
+        Me.FlowLayoutPanel1.Controls.Add(Me.btnRellenar)
         Me.FlowLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Fill
         Me.FlowLayoutPanel1.Location = New System.Drawing.Point(3, 3)
         Me.FlowLayoutPanel1.Name = "FlowLayoutPanel1"
@@ -427,6 +433,45 @@ Partial Class MFMain
         Me.btnLoad.Text = "Cargar"
         Me.btnLoad.UseVisualStyleBackColor = True
         '
+        'Panel4
+        '
+        Me.Panel4.Location = New System.Drawing.Point(3, 285)
+        Me.Panel4.Name = "Panel4"
+        Me.Panel4.Size = New System.Drawing.Size(57, 22)
+        Me.Panel4.TabIndex = 7
+        '
+        'btnBordes
+        '
+        Me.btnBordes.FlatAppearance.BorderColor = System.Drawing.Color.DimGray
+        Me.btnBordes.FlatAppearance.MouseDownBackColor = System.Drawing.Color.CadetBlue
+        Me.btnBordes.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(CType(CType(42, Byte), Integer), CType(CType(42, Byte), Integer), CType(CType(42, Byte), Integer))
+        Me.btnBordes.FlatStyle = System.Windows.Forms.FlatStyle.Flat
+        Me.btnBordes.Font = New System.Drawing.Font("Segoe UI", 9.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.btnBordes.ForeColor = System.Drawing.Color.Gainsboro
+        Me.btnBordes.Location = New System.Drawing.Point(2, 313)
+        Me.btnBordes.Margin = New System.Windows.Forms.Padding(2, 3, 2, 3)
+        Me.btnBordes.Name = "btnBordes"
+        Me.btnBordes.Size = New System.Drawing.Size(58, 41)
+        Me.btnBordes.TabIndex = 8
+        Me.btnBordes.Text = "Bordes"
+        Me.btnBordes.UseVisualStyleBackColor = True
+        '
+        'btnRellenar
+        '
+        Me.btnRellenar.FlatAppearance.BorderColor = System.Drawing.Color.DimGray
+        Me.btnRellenar.FlatAppearance.MouseDownBackColor = System.Drawing.Color.CadetBlue
+        Me.btnRellenar.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(CType(CType(42, Byte), Integer), CType(CType(42, Byte), Integer), CType(CType(42, Byte), Integer))
+        Me.btnRellenar.FlatStyle = System.Windows.Forms.FlatStyle.Flat
+        Me.btnRellenar.Font = New System.Drawing.Font("Segoe UI", 6.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.btnRellenar.ForeColor = System.Drawing.Color.Gainsboro
+        Me.btnRellenar.Location = New System.Drawing.Point(2, 360)
+        Me.btnRellenar.Margin = New System.Windows.Forms.Padding(2, 3, 2, 3)
+        Me.btnRellenar.Name = "btnRellenar"
+        Me.btnRellenar.Size = New System.Drawing.Size(58, 41)
+        Me.btnRellenar.TabIndex = 9
+        Me.btnRellenar.Text = "Rellenar"
+        Me.btnRellenar.UseVisualStyleBackColor = True
+        '
         'MFMain
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
@@ -478,5 +523,8 @@ Partial Class MFMain
     Friend WithEvents btnArbol As System.Windows.Forms.Button
     Friend WithEvents btnEscombros As System.Windows.Forms.Button
     Friend WithEvents btnLoad As System.Windows.Forms.Button
+    Friend WithEvents Panel4 As System.Windows.Forms.Panel
+    Friend WithEvents btnBordes As System.Windows.Forms.Button
+    Friend WithEvents btnRellenar As System.Windows.Forms.Button
 
 End Class

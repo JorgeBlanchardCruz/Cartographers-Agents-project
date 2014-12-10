@@ -74,7 +74,7 @@ Public Class MFMain
 
     End Function
 
-    Private Sub SaveFile(ByVal PathFile As String)
+    Private Sub SaveMap(ByVal PathFile As String)
         Cursor = System.Windows.Forms.Cursors.WaitCursor
         Try
             Dim Dimension As String = (Me.grid.RowCount) & "x" & (Me.grid.ColumnCount) & Chr(13)
@@ -106,7 +106,7 @@ Public Class MFMain
         End Try
     End Sub
 
-    Private Sub LoadFile(ByVal PathFile As String)
+    Private Sub LoadMap(ByVal PathFile As String)
 
         Dim Entity As String = "Dimension"
 
@@ -119,7 +119,6 @@ Public Class MFMain
 
             Select Case Entity
                 Case "Dimension"
-
                     Dim Height As Integer = Line.Substring(0, InStr(Line, "x") - 1)
                     Dim Width As Integer = Line.Substring(InStr(Line, "x"), Line.Length - InStr(Line, "x"))
 
@@ -147,6 +146,26 @@ Public Class MFMain
 
         sr.Close()
 
+    End Sub
+
+    Private Sub PaintBorders(ByVal color As Color, ByVal value As Integer)
+        For row As Integer = 0 To Me.grid.RowCount - 1
+            For column As Integer = 0 To Me.grid.ColumnCount - 1
+                If (row = 0 Or row = Me.grid.RowCount - 1 Or column = 0 Or column = Me.grid.ColumnCount - 1) Then
+                    CellPaint(row, column, color, value)
+                End If
+            Next column
+        Next row
+    End Sub
+
+    Private Sub Fill(ByVal color As Color, ByVal value As Integer)
+        For row As Integer = 0 To Me.grid.RowCount - 1
+            For column As Integer = 0 To Me.grid.ColumnCount - 1
+                If ((Me.grid.Rows(row).Cells(column).Value Is Nothing) OrElse (Me.grid.Rows(row).Cells(column).Value = 0)) Then
+                    CellPaint(row, column, color, value)
+                End If
+            Next column
+        Next row
     End Sub
 
 #End Region
@@ -190,7 +209,7 @@ Public Class MFMain
         saveFileDialog.Title = "Guardar fichero de mapa"
         saveFileDialog.ShowDialog()
         If saveFileDialog.FileName <> String.Empty Then
-            SaveFile(saveFileDialog.FileName)
+            SaveMap(saveFileDialog.FileName)
 
             MessageBox.Show("Mapa guardado.")
         End If
@@ -202,8 +221,16 @@ Public Class MFMain
         openFileDialog.Title = "Cargar fichero de mapa"
         openFileDialog.ShowDialog()
         If openFileDialog.FileName <> String.Empty Then
-            LoadFile(openFileDialog.FileName)
+            LoadMap(openFileDialog.FileName)
         End If
+    End Sub
+
+    Private Sub btnBordes_Click(sender As Object, e As EventArgs) Handles btnBordes.Click
+        PaintBorders(SelectedColor, SelectedValue)
+    End Sub
+
+    Private Sub btnRellenar_Click(sender As Object, e As EventArgs) Handles btnRellenar.Click
+        Fill(SelectedColor, SelectedValue)
     End Sub
 
 #Region "   Paint"
@@ -241,10 +268,6 @@ Public Class MFMain
 #End Region
 
 #End Region
-
-
-
-
 
 
 End Class
