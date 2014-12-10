@@ -89,7 +89,7 @@ var C3DWorld = function (Antialias, OceanScene) {
             new Block('suelo', _TypeBlock[2], 'meshes/rock3.jpg', '#91683C', 0.25),
             new Block('pared', _TypeBlock[0], 'meshes/rock.jpg', '#6B5A37', 1),
             new Block('escombros', _TypeBlock[1], 'meshes/plywood.jpg', '#F2D21D', 1),
-            new Block('pozo', _TypeBlock[0], 'meshes/water.jpg', '#3D85B3', 0.1),
+            new Block('agua', _TypeBlock[0], 'meshes/water.jpg', '#3D85B3', 0.1),
             new Block('árbol', _TypeBlock[0], '', '#628233', 0.1),
         ];
     }

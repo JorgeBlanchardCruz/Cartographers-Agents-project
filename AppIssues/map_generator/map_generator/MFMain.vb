@@ -2,7 +2,8 @@
 
 Public Class MFMain
 
-
+    Private Const _SEP_COORD = ","
+    Private Const _SET_TYPE = ";"
     Private Const ROWSIZE = 30
 
     Private SelectedColor As Color
@@ -55,7 +56,25 @@ Public Class MFMain
         Me.grid.Rows(row).Cells(col).Value = value
     End Sub
 
-    Private Sub Save(ByVal PathFile As String)
+    Private Function get_Color(ByVal value As Integer) As Color
+        Select Case value
+            Case -1
+                Return btnAgente.BackColor
+            Case 1
+                Return btnPared.BackColor
+            Case 2
+                Return btnEscombros.BackColor
+            Case 3
+                Return btnAgua.BackColor
+            Case 4
+                Return btnArbol.BackColor
+        End Select
+
+        Return Color.White
+
+    End Function
+
+    Private Sub SaveFile(ByVal PathFile As String)
         Cursor = System.Windows.Forms.Cursors.WaitCursor
         Try
             Dim Dimension As String = (Me.grid.RowCount) & "x" & (Me.grid.ColumnCount) & Chr(13)
@@ -87,7 +106,46 @@ Public Class MFMain
         End Try
     End Sub
 
-    Private Sub Load(ByVal PathFile As String)
+    Private Sub LoadFile(ByVal PathFile As String)
+
+        Dim Entity As String = "Dimension"
+
+        Dim sr As New System.IO.StreamReader(PathFile)
+        While Not sr.EndOfStream
+
+            Dim Line As String = sr.ReadLine
+
+            Entity = If(Line = "Agents" Or Line = "Blocks", Line, Entity)
+
+            Select Case Entity
+                Case "Dimension"
+
+                    Dim Height As Integer = Line.Substring(0, InStr(Line, "x") - 1)
+                    Dim Width As Integer = Line.Substring(InStr(Line, "x"), Line.Length - InStr(Line, "x"))
+
+                    MapCreate(Height, Width)
+
+                Case "Agents"
+                    If (Line <> "Agents") Then
+                        Dim z As Integer = Line.Substring(0, InStr(Line, _SEP_COORD) - 1)
+                        Dim x As Integer = Line.Substring(InStr(Line, _SEP_COORD), Line.Length - InStr(Line, _SEP_COORD))
+                        Dim type As Integer = -1
+
+                        CellPaint(z, x, get_Color(type), type)
+                    End If
+                Case "Blocks"
+                    If (Line <> "Blocks") Then
+                        Dim z As Integer = Line.Substring(0, InStr(Line, _SEP_COORD) - 1)
+                        Dim x As Integer = Line.Substring(InStr(Line, _SEP_COORD), InStr(Line, _SET_TYPE) - 1 - InStr(Line, _SEP_COORD))
+                        Dim type As Integer = Line.Substring(InStr(Line, _SET_TYPE), Line.Length - InStr(Line, _SET_TYPE))
+
+                        CellPaint(z, x, get_Color(type), type)
+                    End If
+            End Select
+
+        End While
+
+        sr.Close()
 
     End Sub
 
@@ -132,7 +190,7 @@ Public Class MFMain
         saveFileDialog.Title = "Guardar fichero de mapa"
         saveFileDialog.ShowDialog()
         If saveFileDialog.FileName <> String.Empty Then
-            Save(saveFileDialog.FileName)
+            SaveFile(saveFileDialog.FileName)
 
             MessageBox.Show("Mapa guardado.")
         End If
@@ -144,7 +202,7 @@ Public Class MFMain
         openFileDialog.Title = "Cargar fichero de mapa"
         openFileDialog.ShowDialog()
         If openFileDialog.FileName <> String.Empty Then
-            Load(openFileDialog.FileName)
+            LoadFile(openFileDialog.FileName)
         End If
     End Sub
 
