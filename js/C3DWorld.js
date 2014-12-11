@@ -385,6 +385,8 @@ var C3DWorld = function (Antialias, OceanScene) {
             if ((object.name == _TypeBlock[0]) ||
                 (object.name == _TypeBlock[1]) ||
                 (object.name == _TypeBlock[2]) ||
+                (object.name == _TypeBlock[3]) ||
+                (object.name == _TypeBlock[4]) ||
                 (object.name == "agent") ||
                 (object.name == "marker") ||
                 (object.name == "markerCalc")) {

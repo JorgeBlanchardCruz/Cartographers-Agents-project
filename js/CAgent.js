@@ -793,8 +793,8 @@ var CAgent = function (Params, Tasks, Name, speed, Position, ActiveCollisions) {
         var movement = "stop";
 
         function UpdateSensors() {
-            var z = _Visualobj.position.z;
-            var x = _Visualobj.position.x;
+            var z = Number(_Visualobj.position.z.toFixed(0));
+            var x = Number(_Visualobj.position.x.toFixed(0));
             _sensors._up = (z > 0 ? Params.MAPMatrix[z - 1][x] : _BLOCKEXIT);
             _sensors._down = (z < Params.height - 1 ? Params.MAPMatrix[z + 1][x] : _BLOCKEXIT);
             _sensors._right = (x < Params.width - 1 ? Params.MAPMatrix[z][x + 1] : _BLOCKEXIT);
@@ -837,7 +837,6 @@ var CAgent = function (Params, Tasks, Name, speed, Position, ActiveCollisions) {
                 return;
             }
             
-
             function CreateTasks(mov) {
                 /*debe dejar tareas por hacer de los lugares que no visita,
                     sin contar por el que está apunto de abordar.
@@ -859,7 +858,7 @@ var CAgent = function (Params, Tasks, Name, speed, Position, ActiveCollisions) {
                 }
             }
             
-            var currentpos = new position(_Visualobj.position.z, _Visualobj.position.x);
+            var currentpos = new position(Number(_Visualobj.position.z.toFixed(0)), Number(_Visualobj.position.x.toFixed(0)));
 
             Remove();
 
@@ -963,12 +962,12 @@ var CAgent = function (Params, Tasks, Name, speed, Position, ActiveCollisions) {
             Bound(); //Eliminar tareas obsoletas.
 
             var DiscardTasks = new Array();
-            var Start = new position(_Visualobj.position.z, _Visualobj.position.x);
+            var Start = new position(Number(_Visualobj.position.z.toFixed(0)), Number(_Visualobj.position.x.toFixed(0)));
             var Objetive;
             var iTask = -1; //se utiliza para obtener la tarea a realizar y en la nueva iteración, que no la tenga encuenta
             var chosen = false;
             var ichecks = 0;
-            while (!chosen && Tasks.length > 0 && ichecks <= _MAXIMUNCHECKS) {
+            while (!chosen && Tasks.length > 0 && ichecks < _MAXIMUNCHECKS) {
 
                 ichecks++;
 
@@ -1014,14 +1013,16 @@ var CAgent = function (Params, Tasks, Name, speed, Position, ActiveCollisions) {
 
                 ExecPath(stringpath);
 
-                if (ichecks >= _MAXIMUNCHECKS)
+                if (ichecks >= _MAXIMUNCHECKS) {
                     /*El agente ha hecho comprobaciones suficientes de camino 
                     como para identificar que no tiene nada más que hacer*/
                     _function = "finish";
-                else
+                }
+                else {
                     /*si ya se encuentra en su punto de partida y ha terminado todas las tareas
                     entra en estado de espera de tareas*/
                     _function = "wait";
+                }
             }
 
             return;
@@ -1059,6 +1060,10 @@ var CAgent = function (Params, Tasks, Name, speed, Position, ActiveCollisions) {
     //METHODS
     this.setPath = function (name, agentpath) {
         setPath(name, agentpath);
+    }
+
+    this.get_speed = function () {
+        return _speed;
     }
 
     this.Play = function () {

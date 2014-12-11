@@ -31,13 +31,15 @@ var CMothership = function (Params, AgentSpeed) {
     //METHODS
     this.Play = function () {
         for (var i = 0; i < _Agents.length; i++) {
+            _Agents[i].ChangeSpeed(AgentSpeed);
             _Agents[i].Play();
+            AgentSpeed += 0.02;
         }    
     };
 
     this.ChangeSpeed = function (speed) {
         for (var i = 0; i < _Agents.length; i++) {
-            _Agents[i].ChangeSpeed(speed);
+            _Agents[i].ChangeSpeed(_Agents[i].get_speed() + 0.02);
         }
     };
 

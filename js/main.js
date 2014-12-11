@@ -149,7 +149,8 @@ function Add_Events() {
 }
 
 function Load3DUI() {
-    if (MapCAVE != null) MapCAVE.Clear_all();
+    if (MapCAVE != null)
+        MapCAVE.Clear_all();
    
     MapCAVE = new C3DWorld(Antialiasing, OceanScene);
     MapParams = MapCAVE.get_Params();
@@ -200,17 +201,17 @@ function ChangeSpeed() {
     if (MotherSHIP == null)
         return;
 
-    switch (AgentSpeed) {
-        case 0.05:
-            AgentSpeed = 0.2;
-            break;
-        case 0.2:
-            AgentSpeed = 0.5;
-            break;  
-        default:
-            AgentSpeed = 0.05;
-    }
-    MotherSHIP.ChangeSpeed(AgentSpeed);
+    //switch (AgentSpeed) {
+    //    case 0.05:
+    //        AgentSpeed = 0.2;
+    //        break;
+    //    case 0.2:
+    //        AgentSpeed = 0.5;
+    //        break;  
+    //    default:
+    //        AgentSpeed = 0.05;
+    //}
+    MotherSHIP.ChangeSpeed();
 }
 
 function Pause() {
