@@ -263,7 +263,7 @@ var CAgent = function (Params, Tasks, Name, speed, Position, ActiveCollisions) {
         var newspeed = (_distanceNewblock < _speed ? _distanceNewblock : _speed);
 
         if (newspeed != 0) {
-            var translate = (Borders_Delimeters() ? (ActiveCollisions ? (Collisions_perBLOCKS() ? newspeed : 0) : newspeed) : 0);
+            var translate = (Borders_Delimeters() ? (ActiveCollisions ? (Collisions() ? newspeed : 0) : newspeed) : 0);
             _Visualobj.translateZ(translate);
             _distanceNewblock -= newspeed;
         }
