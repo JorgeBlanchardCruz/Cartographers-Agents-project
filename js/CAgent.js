@@ -1083,6 +1083,22 @@ var CAgent = function (Params, Tasks, Name, speed, Position, ActiveCollisions) {
         Rev();
     }
 
+    this.Clear_BlockVisits = function(){
+        for (var i = 0; i < Params.height; i++)
+            for (var j = 0; j < Params.width; j++)
+                if (Params.MAPMatrix[i][j] == _BLOCKVISITED)
+                    Params.MAPMatrix[i][j] = _BLOCKFREE;
+
+        for (var i = 0; i < Params.scene.children.length; i++) {
+            var object = Params.scene.children[i];
+            if ((object.name == "marker") ||
+                (object.name == "markerCalc")) {
+                Params.scene.remove(object);
+                i--;
+            }
+        }
+    }
+
     this.Move = function (accion) {
         Move(accion);
     };

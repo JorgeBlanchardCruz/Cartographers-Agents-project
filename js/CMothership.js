@@ -49,10 +49,12 @@ var CMothership = function (Params, AgentSpeed) {
         }
     };
 
-    this.Rev = function (speed) {
+    this.Rev = function () {
         for (var i = 0; i < _Agents.length; i++) {
             _Agents[i].Rev();
         }
+
+        _Agents[0].Clear_BlockVisits();
     };
 
     this.Move = function (accion) {
