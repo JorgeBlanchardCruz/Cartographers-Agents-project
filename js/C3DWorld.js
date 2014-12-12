@@ -36,7 +36,7 @@ var C3DWorld = function (Antialias, OceanScene) {
 
     var _TypeBlock;
     var _Blocks;
-    var _PosAgents = new Array();
+    var _PosAgents;
  
     
     //INITIALIZE
@@ -474,6 +474,8 @@ var C3DWorld = function (Antialias, OceanScene) {
                 //modifica el elemento del array de mapa correspondiente
                 _MAPMatrix[z][x] = type;
             }
+
+            _PosAgents = new Array();
 
             var Entity = "Dimension";
             
