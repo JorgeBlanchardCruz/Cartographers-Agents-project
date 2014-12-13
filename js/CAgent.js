@@ -7,7 +7,7 @@
 "use strict";
 
 //la dimensión 'y' ha sido bloqueada
-var CAgent = function (Params, Tasks, Name, speed, Position, ActiveCollisions) {
+var CAgent = function (Params, Tasks, Name, speed, Position, ActiveCollisions, Maxswing) {
 
     //STRUCTURES
     function path(name, path) {
@@ -63,7 +63,7 @@ var CAgent = function (Params, Tasks, Name, speed, Position, ActiveCollisions) {
     
 
     //ATTRIBUTES
-    const _MAXSWING = 0.03;
+    var _MAXSWING = Maxswing; //0.03
     const _SWINGSPEED = 0.001;
     const _SIZE = 0.3;
     const _BLOCKVISITED = 'v';
@@ -162,7 +162,7 @@ var CAgent = function (Params, Tasks, Name, speed, Position, ActiveCollisions) {
 
     function SetBlockvisited() {
         _Visualobj.position.set(Number(_Visualobj.position.x.toFixed(0)), _Visualobj.position.y, Number(_Visualobj.position.z.toFixed(0)));
-        if (Params.MAPMatrix[_Visualobj.position.z][_Visualobj.position.x] != _BLOCKVISITED) {
+        if (Params.MAPMatrix[_Visualobj.position.z][_Visualobj.position.x] == _BLOCKFREE) {
             Params.MAPMatrix[_Visualobj.position.z][_Visualobj.position.x] = _BLOCKVISITED;
             Create_markerCalc(_Visualobj.position.z, _Visualobj.position.x);
         }
@@ -190,7 +190,7 @@ var CAgent = function (Params, Tasks, Name, speed, Position, ActiveCollisions) {
                     _Path.add_indx(Move);
                     break;
                 case 'obstacle':
-                    SetBlockvisited();
+                    //SetBlockvisited();
                     Reactor();
                     break;
                 default: //stop
@@ -259,6 +259,7 @@ var CAgent = function (Params, Tasks, Name, speed, Position, ActiveCollisions) {
 
 
     //  IA  ------------------------------------------------------------------------------
+
     function BlockbyBlock() {
         var newspeed = (_distanceNewblock < _speed ? _distanceNewblock : _speed);
 
@@ -787,10 +788,6 @@ var CAgent = function (Params, Tasks, Name, speed, Position, ActiveCollisions) {
     }
 
     function Autonomy() {
-        if (_function != 'autonomy')
-            return;
-
-        var movement = "stop";
 
         function UpdateSensors() {
             var z = Number(_Visualobj.position.z.toFixed(0));
@@ -912,9 +909,22 @@ var CAgent = function (Params, Tasks, Name, speed, Position, ActiveCollisions) {
                 }
             }
 
+            function Bound2() {
+                /*Elimina las tareas que se repiten*/
+                for (var i = 0; i < Tasks.length - 1; i++)
+                    for (var j = 1; j < Tasks.length; j++)
+                        if (Tasks[i]._position.equal(Tasks[j]._position) && (i != j)) {
+                            Tasks.splice(j, 1);                            
+                            j--;
+                        }
+            }
+
             function Nearest_task() {
+                // asigna la tarea más cercana
 
                 function Discarded() {
+                    //descarta tareas imposibles en ese momento para el agente
+
                     var discard = false;
                     var j = 0;
                     while (!discard && j < DiscardTasks.length) {
@@ -953,6 +963,7 @@ var CAgent = function (Params, Tasks, Name, speed, Position, ActiveCollisions) {
                 movement = "path";
             }
 
+
             if (movement != "stop") // no hay movimiento posible
                 return;
 
@@ -961,10 +972,12 @@ var CAgent = function (Params, Tasks, Name, speed, Position, ActiveCollisions) {
 
             Bound(); //Eliminar tareas obsoletas.
 
+            Bound2(); //Elimina tareas que se repiten.
+
             var DiscardTasks = new Array();
             var Start = new position(Number(_Visualobj.position.z.toFixed(0)), Number(_Visualobj.position.x.toFixed(0)));
             var Objetive;
-            var iTask = -1; //se utiliza para obtener la tarea a realizar y en la nueva iteración, que no la tenga encuenta
+            var iTask = -1;
             var chosen = false;
             var ichecks = 0;
             while (!chosen && Tasks.length > 0 && ichecks < _MAXIMUNCHECKS) {
@@ -972,7 +985,7 @@ var CAgent = function (Params, Tasks, Name, speed, Position, ActiveCollisions) {
                 ichecks++;
 
                 if (Tasks.length > 0) { //si hay tareas pendientes
-                    do { //recoge la posición más cercana que sea diferente de su posición actual
+                    do { //recoge la posición más cercana que sea posible en ese momento y diferente a su posición actual
 
                         iTask = Nearest_task();
                         var maketask = Tasks[iTask];
@@ -1000,7 +1013,7 @@ var CAgent = function (Params, Tasks, Name, speed, Position, ActiveCollisions) {
                     chosen = true;
                 }
                 else { //sino existe camino
-                    //ponemos la tarea donde las desechadas para está vez.
+                    //ponemos la tarea donde las desechadas para este el estado actual del mapa.
                     DiscardTasks.push(Tasks[iTask]);
 
                     chosen = false;
@@ -1029,6 +1042,12 @@ var CAgent = function (Params, Tasks, Name, speed, Position, ActiveCollisions) {
                 
         }
 
+
+        if (_function != 'autonomy')
+            return;
+
+        var movement = "stop";
+
         UpdateSensors();
 
         Decision();
@@ -1037,6 +1056,7 @@ var CAgent = function (Params, Tasks, Name, speed, Position, ActiveCollisions) {
 
         Move(movement);
     }
+
     //////////////////////////////////////////////////////////////////////////////////
 
 

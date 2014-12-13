@@ -244,6 +244,8 @@ function onConfigChange() {
 }
 
 function btnfile_input_onchange() {
+    Pause();
+
     MapCAVE.Clear_Cave();
     MapCAVE.Create_CaveofMapfile(this.files[0], Create_Mothership, Textures);
 }

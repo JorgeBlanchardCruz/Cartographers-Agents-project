@@ -22,9 +22,11 @@ var CMothership = function (Params, AgentSpeed) {
         _Tasks = new Array();
         _Agents = new Array()
 
+        var Maxswing = 0.03;
         for (var i = 0; i < Params.PosAgents.length; i++) {
-            _Agents.push(new CAgent(Params, _Tasks, i, AgentSpeed, Params.PosAgents[i], true));
-            AgentSpeed += 0.02;
+            _Agents.push(new CAgent(Params, _Tasks, i, AgentSpeed, Params.PosAgents[i], true, Maxswing));
+            AgentSpeed += 0.05;
+            Maxswing += 0.005;
         }
     }
 
