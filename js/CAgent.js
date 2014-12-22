@@ -574,7 +574,7 @@ var CAgent = function (Params, Tasks, Name, speed, Position, ActiveCollisions, M
                         anglestart = 90;
                     }
                     
-                } else if (_Startpos.z != this.nodes[1].z) { //movimiento vertical
+                } else if (this.nodes[0].z != this.nodes[1].z) { //movimiento vertical
                     mov = "vertical";
                     if (this.nodes[0].z > this.nodes[1].z) { //arriba
                         stringpath = "aaw";
@@ -853,6 +853,8 @@ var CAgent = function (Params, Tasks, Name, speed, Position, ActiveCollisions, M
                 if (Left && mov != 'Left') {
                     Tasks.push(new task(new position(currentpos.z, currentpos.x - 1), _Name));
                 }
+
+                return null;
             }
             
             var currentpos = new position(Number(_Visualobj.position.z.toFixed(0)), Number(_Visualobj.position.x.toFixed(0)));
@@ -896,7 +898,7 @@ var CAgent = function (Params, Tasks, Name, speed, Position, ActiveCollisions, M
 
         function TaskManager() {
 
-            function Bound() {
+            function BoundO() {
                 /* Sirve para eliminar todas las tareas por las que su posición ya se haya pasado.
                 Tareas obsoletas.
                 */
@@ -909,7 +911,7 @@ var CAgent = function (Params, Tasks, Name, speed, Position, ActiveCollisions, M
                 }
             }
 
-            function Bound2() {
+            function BoundR() {
                 /*Elimina las tareas que se repiten*/
                 for (var i = 0; i < Tasks.length - 1; i++)
                     for (var j = 1; j < Tasks.length; j++)
@@ -917,6 +919,15 @@ var CAgent = function (Params, Tasks, Name, speed, Position, ActiveCollisions, M
                             Tasks.splice(j, 1);                            
                             j--;
                         }
+            }
+
+            function myLast_task() {
+                for (var i = Tasks.length - 1; i >= 0; i--){
+                    if (Tasks[i]._agent == _Name)
+                        return i;
+                }
+
+                return -1;
             }
 
             function Nearest_task() {
@@ -970,9 +981,9 @@ var CAgent = function (Params, Tasks, Name, speed, Position, ActiveCollisions, M
             /*busca en las tareas. En caso de que exista tarea por realizar, 
             ejecutará A* para determinar la ruta mínima de los caminos visitados y llegar hasta la posición de la tarea.*/
 
-            Bound(); //Eliminar tareas obsoletas.
+            BoundO(); //Eliminar tareas obsoletas.
 
-            Bound2(); //Elimina tareas que se repiten.
+            BoundR(); //Elimina tareas que se repiten.
 
             var DiscardTasks = new Array();
             var Start = new position(Number(_Visualobj.position.z.toFixed(0)), Number(_Visualobj.position.x.toFixed(0)));
@@ -985,9 +996,14 @@ var CAgent = function (Params, Tasks, Name, speed, Position, ActiveCollisions, M
                 ichecks++;
 
                 if (Tasks.length > 0) { //si hay tareas pendientes
-                    do { //recoge la posición más cercana que sea posible en ese momento y diferente a su posición actual
 
-                        iTask = Nearest_task();
+                    do {
+                        /* Realizará la última tarea que el propio agente haya creado, sino existiera 
+                         recoge la tarea más cercana que sea posible en ese momento y diferente a su posición actual*/
+                        iTask = myLast_task();
+                        if (iTask == -1)
+                            iTask = Nearest_task();
+
                         var maketask = Tasks[iTask];
                             
                         Objetive = new position(maketask._position.z, maketask._position.x);
@@ -1091,7 +1107,7 @@ var CAgent = function (Params, Tasks, Name, speed, Position, ActiveCollisions, M
     };
 
     this.ChangeSpeed = function (speed) {
-        _speed = speed;
+        _speed = Number(speed.toFixed(2));
     }
 
     this.Pause = function () {

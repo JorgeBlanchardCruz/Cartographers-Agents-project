@@ -5,7 +5,7 @@
  */
 "use strict";
 
-var CMothership = function (Params, AgentSpeed) {
+var CMothership = function (Params) {
 
     //STRUCTURES
 
@@ -22,10 +22,11 @@ var CMothership = function (Params, AgentSpeed) {
         _Tasks = new Array();
         _Agents = new Array()
 
+        var AgentSpeed = 0.1;
         var Maxswing = 0.03;
         for (var i = 0; i < Params.PosAgents.length; i++) {
             _Agents.push(new CAgent(Params, _Tasks, i, AgentSpeed, Params.PosAgents[i], true, Maxswing));
-            AgentSpeed += 0.05;
+            //AgentSpeed += 0.01;
             Maxswing += 0.005;
         }
     }
@@ -33,13 +34,12 @@ var CMothership = function (Params, AgentSpeed) {
     //METHODS
     this.Play = function () {
         for (var i = 0; i < _Agents.length; i++) {
-            _Agents[i].ChangeSpeed(AgentSpeed);
             _Agents[i].Play();
             AgentSpeed += 0.02;
         }    
     };
 
-    this.ChangeSpeed = function (speed) {
+    this.ChangeSpeed = function () {
         for (var i = 0; i < _Agents.length; i++) {
             _Agents[i].ChangeSpeed(_Agents[i].get_speed() + 0.02);
         }

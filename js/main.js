@@ -67,9 +67,9 @@ function position(z, x) {
     }
 };
 
-function task(pos, direction) {
+function task(pos, agent) {
     this._position = new position(pos.z, pos.x);
-    this._direction = direction;
+    this._agent = agent;
 };
 
 
@@ -79,7 +79,7 @@ var MotherSHIP;
 
 var MapParams;
 
-var OceanScene = false, Antialiasing = false, Textures = false, Mapcalculation = false;
+var OceanScene = false, Antialiasing = false, Textures = false, ContraMapa = true;
 
 var AgentSpeed = 0.1; //0.2
 
@@ -90,7 +90,7 @@ var AgentSpeed = 0.1; //0.2
     var chbOceanScene;
     var chbAntialiasing;
     var chbTexturas;
-    var chbMapcalculation;
+    var chbContramapa;
     var btnPlay;
     var btnPlayFast;
     var btnPause;
@@ -120,12 +120,12 @@ function set_HTMLObjects() {
     chbOceanScene = document.getElementById('chbOceanScene');
     chbAntialiasing = document.getElementById('chbAntialiasing');
     chbTexturas = document.getElementById('chbTexturas');
-    chbMapcalculation = document.getElementById('chbMapcalculation');
+    chbContramapa = document.getElementById('chbContramapa');
 
     chbOceanScene.checked = OceanScene;
     chbAntialiasing.checked = Antialiasing;
     chbTexturas.checked = Textures;
-    chbMapcalculation.checked = Mapcalculation;
+    chbContramapa.checked = ContraMapa;
 }
 
 function Add_Events() {
@@ -144,7 +144,7 @@ function Add_Events() {
     chbOceanScene.addEventListener('change', onConfigChange);
     chbAntialiasing.addEventListener('change', onConfigChange);
     chbTexturas.addEventListener('change', onConfigChange);
-    chbMapcalculation.addEventListener('change', onConfigChange);
+    chbContramapa.addEventListener('change', onConfigChange);
 
 }
 
@@ -159,7 +159,7 @@ function Load3DUI() {
 
 function Create_Mothership() { //lo necesito para utilizarlo de callback
     MapParams = MapCAVE.get_Params();
-    MotherSHIP = new CMothership(MapParams, AgentSpeed);
+    MotherSHIP = new CMothership(MapParams);
 }
 
 function toggleFullScreen() {
@@ -240,7 +240,7 @@ function onConfigChange() {
     OceanScene = chbOceanScene.checked;
     Antialiasing = chbAntialiasing.checked;
     Textures = chbTexturas.checked;
-    Mapcalculation = chbMapcalculation.checked;
+    ContraMapa = chbContramapa.checked;
 }
 
 function btnfile_input_onchange() {
