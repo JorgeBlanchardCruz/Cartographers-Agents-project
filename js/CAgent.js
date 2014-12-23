@@ -6,8 +6,7 @@
 
 "use strict";
 
-//la dimensión 'y' ha sido bloqueada
-var CAgent = function (Params, Tasks, Name, speed, Position, ActiveCollisions, Maxswing) {
+var CAgent = function (Params, Tasks, Name, speed, Position, ActiveCollisions, Maxswing, MarkVisited, InverseMap) {
 
     //STRUCTURES
     function path(name, path) {
@@ -63,13 +62,15 @@ var CAgent = function (Params, Tasks, Name, speed, Position, ActiveCollisions, M
     
 
     //ATTRIBUTES
-    var _MAXSWING = Maxswing; //0.03
+    const _COLOR_VISITED= '#31093B';
+    const _COLOR_INVERSEMAP = '#2C3352';
     const _SWINGSPEED = 0.001;
     const _SIZE = 0.3;
     const _BLOCKVISITED = 'v';
     const _BLOCKFREE = -1;
     const _BLOCKEXIT = 'e';
     const _MAXIMUNCHECKS = 10;
+    var _MAXSWING = Maxswing; //0.03
 
     var _Name = Name;
     var _Startpos = new position(Position.z, Position.x);
@@ -119,7 +120,7 @@ var CAgent = function (Params, Tasks, Name, speed, Position, ActiveCollisions, M
         Load_objmtl('meshes/WheatleyModel.obj', 'meshes/Ghost.mtl', _Startpos.x, 0, _Startpos.z, 0.08, 0.08, 0.08);   
 
         Params.MAPMatrix[_Startpos.z][_Startpos.x] = _BLOCKVISITED;
-        Create_markerCalc(_Startpos.z, _Startpos.x);
+        VisualBlockVisited(_Startpos.z, _Startpos.x);
 
         animate();
     }
@@ -145,26 +146,35 @@ var CAgent = function (Params, Tasks, Name, speed, Position, ActiveCollisions, M
     }
 
     function Create_marker(z, x) {
-        var object = new THREE.Mesh(new THREE.SphereGeometry(.15, 50, 50), new THREE.MeshBasicMaterial({ /*transparent: true, opacity: 0.7,*/ color: '#49A32A' }));
+        var object = new THREE.Mesh(new THREE.SphereGeometry(.15, 50, 50), new THREE.MeshBasicMaterial({ transparent: true, opacity: 0.4, color: '#49A32A' }));
         object.name = "marker";
         object.position.set(x, 0, z);
 
         Params.scene.add(object);
     }
 
-    function Create_markerCalc(z, x) {
-        var object = new THREE.Mesh(new THREE.BoxGeometry(1, 1, 1), new THREE.MeshBasicMaterial({ transparent: true, opacity: 0.2, color: '#7938D9' }));
+    function Create_markerCalc(z, x, y, height, color, opacity) {
+        //MeshLambertMaterial
+        var object = new THREE.Mesh(new THREE.BoxGeometry(1, height, 1), new THREE.MeshLambertMaterial({ transparent: true, opacity: opacity, color: color }));
         object.name = "markerCalc";
-        object.position.set(x, 0, z);
+        object.position.set(x, y, z);
 
         Params.scene.add(object);
+    }
+
+    function VisualBlockVisited(z, x) {
+        if (MarkVisited)
+            Create_markerCalc(z, x, 0, 1, _COLOR_VISITED, 0.2);
+        if (InverseMap)
+            Create_markerCalc(z - Params.height - 10, x, -0.5, 0.2, _COLOR_INVERSEMAP, 1);
     }
 
     function SetBlockvisited() {
         _Visualobj.position.set(Number(_Visualobj.position.x.toFixed(0)), _Visualobj.position.y, Number(_Visualobj.position.z.toFixed(0)));
         if (Params.MAPMatrix[_Visualobj.position.z][_Visualobj.position.x] == _BLOCKFREE) {
             Params.MAPMatrix[_Visualobj.position.z][_Visualobj.position.x] = _BLOCKVISITED;
-            Create_markerCalc(_Visualobj.position.z, _Visualobj.position.x);
+
+            VisualBlockVisited(_Visualobj.position.z, _Visualobj.position.x);
         }
     }
 
@@ -289,11 +299,11 @@ var CAgent = function (Params, Tasks, Name, speed, Position, ActiveCollisions, M
         var possible = true;
         switch (_direction) { //según el movimiento Wheatley en el mapa
             case 0: //adelante
-                if (_Visualobj.position.z >= Params.height - 1)
+                if (_Visualobj.position.z >= Params.height - 0.9)
                     possible = false;
                 break;
             case 90: //izquierda
-                if (_Visualobj.position.x >= Params.width - 1)
+                if (_Visualobj.position.x >= Params.width - 0.9)
                     possible = false;
                 break;
             case 180: //atrás
@@ -652,7 +662,7 @@ var CAgent = function (Params, Tasks, Name, speed, Position, ActiveCollisions, M
                     OPEN.push(nbranch);
 
                     if (Mapcalculation) {
-                        Create_markerCalc(z, x); //crea un markador de calculo en el mapa
+                        VisualBlockVisited(z, x); //crea un markador de calculo en el mapa
                     }
 
                     count_newbranchs++;

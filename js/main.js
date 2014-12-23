@@ -79,7 +79,7 @@ var MotherSHIP;
 
 var MapParams;
 
-var OceanScene = false, Antialiasing = false, Textures = false, ContraMapa = true;
+var OceanScene = false, Antialiasing = true, Textures = false, InverseMap = true, MarkVisited = true;
 
 var AgentSpeed = 0.1; //0.2
 
@@ -90,7 +90,8 @@ var AgentSpeed = 0.1; //0.2
     var chbOceanScene;
     var chbAntialiasing;
     var chbTexturas;
-    var chbContramapa;
+    var chbInverseMap;
+    var chbMarkVisited;
     var btnPlay;
     var btnPlayFast;
     var btnPause;
@@ -120,12 +121,14 @@ function set_HTMLObjects() {
     chbOceanScene = document.getElementById('chbOceanScene');
     chbAntialiasing = document.getElementById('chbAntialiasing');
     chbTexturas = document.getElementById('chbTexturas');
-    chbContramapa = document.getElementById('chbContramapa');
+    chbInverseMap = document.getElementById('chbInverseMap');
+    chbMarkVisited = document.getElementById('chbMarkVisited');
 
     chbOceanScene.checked = OceanScene;
     chbAntialiasing.checked = Antialiasing;
     chbTexturas.checked = Textures;
-    chbContramapa.checked = ContraMapa;
+    chbInverseMap.checked = InverseMap;
+    chbMarkVisited.checked = MarkVisited;
 }
 
 function Add_Events() {
@@ -144,7 +147,8 @@ function Add_Events() {
     chbOceanScene.addEventListener('change', onConfigChange);
     chbAntialiasing.addEventListener('change', onConfigChange);
     chbTexturas.addEventListener('change', onConfigChange);
-    chbContramapa.addEventListener('change', onConfigChange);
+    chbInverseMap.addEventListener('change', onConfigChange);
+    chbMarkVisited.addEventListener('change', onConfigChange);
 
 }
 
@@ -159,7 +163,7 @@ function Load3DUI() {
 
 function Create_Mothership() { //lo necesito para utilizarlo de callback
     MapParams = MapCAVE.get_Params();
-    MotherSHIP = new CMothership(MapParams);
+    MotherSHIP = new CMothership(MapParams, MarkVisited, InverseMap);
 }
 
 function toggleFullScreen() {
@@ -240,7 +244,8 @@ function onConfigChange() {
     OceanScene = chbOceanScene.checked;
     Antialiasing = chbAntialiasing.checked;
     Textures = chbTexturas.checked;
-    ContraMapa = chbContramapa.checked;
+    InverseMap = chbInverseMap.checked;
+    MarkVisited = chbMarkVisited.checked;
 }
 
 function btnfile_input_onchange() {

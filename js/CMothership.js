@@ -5,7 +5,7 @@
  */
 "use strict";
 
-var CMothership = function (Params) {
+var CMothership = function (Params, MarkVisited, InverseMap) {
 
     //STRUCTURES
 
@@ -25,8 +25,8 @@ var CMothership = function (Params) {
         var AgentSpeed = 0.1;
         var Maxswing = 0.03;
         for (var i = 0; i < Params.PosAgents.length; i++) {
-            _Agents.push(new CAgent(Params, _Tasks, i, AgentSpeed, Params.PosAgents[i], true, Maxswing));
-            //AgentSpeed += 0.01;
+            _Agents.push(new CAgent(Params, _Tasks, i, AgentSpeed, Params.PosAgents[i], true, Maxswing, MarkVisited, InverseMap));
+            AgentSpeed += 0.01;
             Maxswing += 0.005;
         }
     }

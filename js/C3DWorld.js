@@ -20,7 +20,7 @@ var C3DWorld = function (Antialias, OceanScene) {
     //ATTRIBUTES
     const _SEP_COORD = ',';
     const _SET_TYPE = ';';
-    const _COLOR_BACKGROUNDSCENE = '#BDE6F2';
+    const _COLOR_BACKGROUNDSCENE = '#EDEDED';
     const _BLOCKFREE = -1;
 
         //Objetos para la escena
