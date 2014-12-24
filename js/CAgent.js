@@ -62,7 +62,7 @@ var CAgent = function (Params, Tasks, Name, speed, Position, ActiveCollisions, M
     
 
     //ATTRIBUTES
-    const _COLOR_VISITED= '#31093B';
+    const _COLOR_VISITED = '#1D7D2E';
     const _COLOR_INVERSEMAP = '#2C3352';
     const _SWINGSPEED = 0.001;
     const _SIZE = 0.3;
@@ -164,9 +164,9 @@ var CAgent = function (Params, Tasks, Name, speed, Position, ActiveCollisions, M
 
     function VisualBlockVisited(z, x) {
         if (MarkVisited)
-            Create_markerCalc(z, x, 0, 1, _COLOR_VISITED, 0.2);
+            Create_markerCalc(z, x, -0.3, 0.2, _COLOR_VISITED, 0.2);
         if (InverseMap)
-            Create_markerCalc(z - Params.height - 10, x, -0.5, 0.2, _COLOR_INVERSEMAP, 1);
+            Create_markerCalc(z - Params.height - 10, x, -0.3, 0.2, _COLOR_INVERSEMAP, 1);
     }
 
     function SetBlockvisited() {
