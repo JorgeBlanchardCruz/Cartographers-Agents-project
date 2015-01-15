@@ -20,7 +20,7 @@ var CMothership = function (Params, MarkVisited, InverseMap) {
     //PROCEDURES
     function init() {
         _Tasks = new Array();
-        _Agents = new Array()
+        _Agents = new Array();
 
         var AgentSpeed = 0.1;
         var Maxswing = 0.03;
